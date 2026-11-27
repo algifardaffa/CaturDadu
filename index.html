@@ -104,7 +104,7 @@ dialog::backdrop { background: rgba(46,26,15,.45); }
 <main id="view" aria-live="polite"><div class="center"><div class="spinner"></div>Memuat…</div></main>
 <dialog id="modal"></dialog>
 <div id="toast" role="status"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -699,12 +699,32 @@ window.addEventListener('hashchange', () => {
 });
 
 // ---- startup ----
+function normalizeSupabaseUrl(raw) {
+  let u;
+  try { u = new URL(String(raw || '').trim()); }
+  catch { throw new Error('SUPABASE_URL tidak valid. Isi dengan URL Project Supabase, contoh https://xxxx.supabase.co'); }
+  if (u.protocol !== 'https:' && u.hostname !== 'localhost')
+    throw new Error('SUPABASE_URL harus menggunakan HTTPS.');
+
+  // URL project harus berupa root domain. Jika tanpa sengaja yang disalin
+  // adalah ...supabase.co/rest/v1, Auth akan salah mengarah ke
+  // /rest/v1/auth/v1/token (404). Bersihkan suffix API tersebut otomatis.
+  u.pathname = u.pathname.replace(/\/(?:rest|auth|storage)\/v1(?:\/.*)?$/i, '');
+  if (u.pathname && u.pathname !== '/')
+    throw new Error('SUPABASE_URL harus URL utama project, bukan URL endpoint /rest/v1.');
+  return u.origin;
+}
+
 async function start(route) {
   loading();
   try {
     if (!window.supabase) throw new Error('Library Supabase gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.');
     if (/YOUR-/.test(CONFIG.SUPABASE_URL + CONFIG.SUPABASE_KEY)) return configScreen();
-    sb ||= window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY,
+    const projectUrl = normalizeSupabaseUrl(CONFIG.SUPABASE_URL);
+    if (!CONFIG.SUPABASE_KEY || CONFIG.SUPABASE_KEY.startsWith('YOUR-'))
+      throw new Error('SUPABASE_KEY belum diisi. Gunakan publishable key atau anon key, bukan service_role.');
+    console.info('[Dice Chess] Supabase project:', projectUrl);
+    sb ||= window.supabase.createClient(projectUrl, CONFIG.SUPABASE_KEY,
       { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
     const { data: { session }, error } = await sb.auth.getSession();
     if (error) throw error;
