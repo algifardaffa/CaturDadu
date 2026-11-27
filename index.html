@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="only light">
-<meta name="theme-color" content="#493323">
+<meta name="theme-color" content="#59483B">
 <title>Dice Chess</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="assets/favicon.png">
@@ -907,6 +907,207 @@ body:not(.playing) #secSetup.playcard {
   border-color:#BEAA98;
 }
 .replay-wrap .toolbar button .ico { color:#fff; }
+
+
+
+/* ===== Complete palette: Warm Ivory & Mocha ===== */
+:root {
+  color-scheme: only light;
+  --bg:#F7F4EF;
+  --surface:#FFFFFF;
+  --cocoa:#40352E;
+  --cocoa-hover:#59483B;
+  --caramel:#B59A82;
+  --sand:#E8DED3;
+  --warm:#887B70;
+  --tint:#F5F1EC;
+  --ok:#52765D;
+  --ok-bg:#E8F0E8;
+  --danger:#A85D50;
+  --danger-bg:#F5E9E5;
+  --sq-light:#F7F4EF;
+  --sq-dark:#D4C3B2;
+  --head:#E8DED3;
+  --head2:#DCCFC2;
+  --head-ink:#40352E;
+  --btn1:#B59A82;
+  --btn2:#A58A72;
+  --btn-line:#9A8069;
+  --tan1:#D4C3B2;
+  --tan2:#C5B19D;
+  --tan-line:#B8A28D;
+  --bubble1:#F7F4EF;
+  --bubble2:#EEE7DF;
+  --shadow:0 1px 2px rgba(64,53,46,.035), 0 6px 20px rgba(64,53,46,.055);
+}
+meta[name="theme-color"] { color:#40352E; }
+body { background:var(--bg); color:var(--cocoa); }
+#nav { background:#59483B; color:#F7F4EF; }
+.profile-btn, .conn, .install-btn { color:#F7F4EF; }
+.profile-text small { color:#E5D9CC; }
+.profile-card, .card, .panel, dialog { background:var(--surface); border-color:var(--sand); color:var(--cocoa); }
+h1,h2,h3,a { color:var(--cocoa); }
+.muted, .note, .center, label, .field-label, .cmp td.shared,
+.htext small, .seat .who small, .side small, .match-summary .versus-row .muted {
+  color:var(--warm);
+}
+.title-row h2 .ico, .cmp-label .ico, h1.ttl .ico { color:var(--caramel); }
+code, .mark.draw, .cmp .best { background:#EEE7DF; color:var(--cocoa); }
+.card, .panel, .profile-card, dialog, select, input { border-color:var(--sand); }
+button, .button, :where(button,.button) {
+  background:linear-gradient(180deg,#B59A82,#A58A72);
+  border-color:#9A8069;
+  color:#fff;
+}
+button:hover:not(:disabled), .button:hover:not(.ghost),
+:where(button,.button):hover:not(:disabled) {
+  background:linear-gradient(180deg,#A88C74,#947A64);
+  border-color:#947A64;
+}
+button.ghost, .button.ghost, .match-summary button.ghost {
+  background:#FFFFFF;
+  color:var(--cocoa);
+  border-color:var(--sand);
+}
+button.ghost:hover:not(:disabled), .button.ghost:hover,
+.match-summary button.ghost:hover:not(:disabled) {
+  background:#F5F1EC;
+  border-color:#C5B19D;
+}
+button.danger { background:#fff; color:var(--danger); border-color:#E6CFC8; }
+button.danger:hover:not(:disabled) { background:var(--danger-bg); border-color:var(--danger); }
+select, input { background:#fff; color:var(--cocoa); }
+select:focus, input:focus { border-color:var(--caramel); box-shadow:0 0 0 3px rgba(181,154,130,.22); }
+input[type=checkbox] { accent-color:#8F725A; }
+:focus-visible { outline-color:#A58A72; }
+.avatar { background:#F5F1EC; color:var(--cocoa); border-color:var(--sand); }
+.presets button[aria-pressed=true] { background:#8F725A; border-color:#8F725A; color:#fff; }
+.dot { background:#C9BFB5; }
+.dot.on, .conn::before { background:#73947A; }
+.conn.bad::before { background:#C77C6E; }
+.conn.connecting::before { background:#B59A82; }
+.spinner { border-color:var(--sand); border-top-color:#8F725A; }
+.errbox { border-left-color:var(--danger); }
+dl.stats dt, dl.stats dd, th, td { border-color:var(--sand); }
+th { color:var(--warm); }
+.cmp tbody tr, .hrow { background:#FFFFFF; }
+.cmp tbody tr:nth-child(even), .hrow:nth-child(even) { background:#F5F1EC; }
+.cmp tbody tr:hover, .hrow:hover { background:#EEE7DF; }
+.cmp thead th, .hhead, .hist-body .filters, .rbar {
+  background:#E8DED3;
+  color:var(--cocoa);
+}
+.cmp thead th.num, .hist-body .filters > label { color:var(--cocoa); }
+.hist-body .filters select {
+  background:#fff;
+  color:var(--cocoa);
+  border-color:#DCCFC2;
+}
+.vs { background:#F5F1EC; border-color:var(--sand); color:var(--warm); }
+.colorbtn, .bubble .colorbtn, #setupBody .colorbtn {
+  background:#fff;
+  border-color:var(--sand);
+}
+.colorbtn[aria-checked=true], .bubble .colorbtn[aria-checked=true],
+#setupBody .colorbtn[aria-checked=true] {
+  background:#F5F1EC;
+  border-color:#A58A72;
+  box-shadow:0 0 0 2px rgba(181,154,130,.28);
+}
+.colorbtn[aria-checked=true] small, .bubble .colorbtn small,
+#setupBody .colorbtn small { color:var(--cocoa); }
+.knight { -webkit-text-stroke-color:var(--cocoa); }
+.board { border-color:#A58A72; }
+.board button, .board button:hover:not(:disabled) { background:var(--sq-light); color:var(--cocoa); }
+.board button.dark, .board button.dark:hover:not(:disabled) { background:var(--sq-dark); }
+.board button.last { box-shadow:inset 0 0 0 100px rgba(181,154,130,.34); }
+.board button.selected { box-shadow:inset 0 0 0 3px #8F725A, inset 0 0 0 100px rgba(181,154,130,.32); }
+.board button.movable::before { background:radial-gradient(circle closest-side,transparent 114%,rgba(100,139,108,.82) 116%); }
+.board button.movable.selected::before { background:rgba(100,139,108,.58); }
+.board button.target::after { background:rgba(82,118,93,.76); }
+.board button.target.occupied::after { background:none; border-color:rgba(82,118,93,.84); }
+.piece-w { color:#fff; -webkit-text-stroke:1.5px #59483B; }
+.piece-b { color:#29231F; }
+.coord { color:#40352E; }
+.die { background:#F5F1EC; border-color:var(--sand); }
+.die b { color:var(--cocoa); }
+.wave, #nav .wave, .bubble .wave { color:#C5B19D; }
+.bubble, #setupBody > .setup-bubble, .match-summary {
+  background:linear-gradient(180deg,#FFFFFF 0%,#F1EBE4 100%);
+  border-color:#E8DED3;
+  box-shadow:0 6px 20px rgba(64,53,46,.06), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.bubble .panel, .bubble > .card.wavy {
+  background:#FFFFFF;
+  border-color:#E8DED3;
+}
+.bubble .versus-row { background:rgba(255,255,255,.72); border-color:rgba(232,222,211,.9); }
+.bubble .vs, #setupBody .vs, .match-summary .vs {
+  background:#F5F1EC;
+  color:#887B70;
+}
+#setupBody .versus-row .avatar, .match-summary .versus-row .avatar {
+  border-color:#fff;
+}
+#setupBody .rollbtn, #setupBody button.rollbtn {
+  background:linear-gradient(180deg,#B59A82,#A58A72);
+  border-color:#9A8069;
+  color:#fff;
+  box-shadow:0 4px 12px rgba(64,53,46,.14);
+}
+#setupBody .rollbtn:hover:not(:disabled) { background:linear-gradient(180deg,#A88C74,#947A64); }
+#setupBody button.ghost:not(.colorbtn), .bubble button.ghost:not(.colorbtn) {
+  background:#fff;
+  border-color:#E8DED3;
+  color:#40352E;
+}
+#setupBody button.ghost:not(.colorbtn):hover:not(:disabled),
+.bubble button.ghost:not(.colorbtn):hover:not(:disabled) {
+  background:#F5F1EC;
+  border-color:#C5B19D;
+}
+.match-summary .actions2 .button:not(.ghost),
+.match-summary a.button:not(.ghost) {
+  background:linear-gradient(180deg,#B59A82,#A58A72);
+  border-color:#9A8069;
+  color:#fff;
+}
+.match-summary .actions2 .button:not(.ghost):hover,
+.match-summary a.button:not(.ghost):hover {
+  background:linear-gradient(180deg,#A88C74,#947A64);
+}
+.button.replay, .button.replay:hover,
+.replay-wrap .toolbar button {
+  background:linear-gradient(180deg,#D4C3B2,#C5B19D);
+  border:1px solid #B8A28D;
+  color:#40352E;
+  box-shadow:0 3px 8px rgba(64,53,46,.09);
+}
+.replay-wrap .toolbar button:hover:not(:disabled),
+.button.replay:hover:not(:disabled) {
+  background:linear-gradient(180deg,#CBB8A5,#BBA58F);
+  border-color:#A9947F;
+}
+.replay-wrap .toolbar button .ico, .toolbar .ico { color:#59483B; }
+.replay-wrap .panel { background:transparent; border-color:transparent; }
+.mrow, .cmp tbody tr { background:#fff; }
+.mrow:nth-child(even) { background:#F5F1EC; }
+.mnum { color:var(--warm); }
+.mvc.cur { background:rgba(181,154,130,.22); box-shadow:0 0 0 3px rgba(181,154,130,.22); }
+.mv.w, .mv.b {
+  background:#fff;
+  border:1px solid #E8DED3;
+  color:#40352E;
+  box-shadow:none;
+}
+.mv.w .g { color:#fff; -webkit-text-stroke:1.2px #40352E; }
+.mv.b .g { color:#171717; -webkit-text-stroke:0; }
+.mark.win { background:#E8F0E8; color:#52765D; }
+.mark.loss { background:#F5E9E5; color:#A85D50; }
+.mark.draw { background:#EEE7DF; color:#59483B; }
+.mark.none { background:#F5F1EC; color:#887B70; }
+dialog::backdrop { background:rgba(64,53,46,.34); }
+.toast { background:#59483B; color:#fff; box-shadow:0 12px 32px rgba(64,53,46,.18); }
 
 </style>
 </head>
