@@ -401,6 +401,24 @@ a.button:not(.ghost), a.button:not(.ghost):hover, .button.replay, .button.replay
 .mvc.cur { background:rgba(139,94,60,.38); box-shadow:0 0 0 4px rgba(139,94,60,.38); }
 .actions2 { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px; }
 .actions2 > * { width:100%; min-width:0; }
+
+/* ==== Revisi: kepala tabel coklat, bubble hitam coklat tua, filter inline ==== */
+:root { --head:#9C7556; }
+.cmp thead th { background:var(--head); color:#fff; border-bottom:0; }
+.cmp thead th.num { color:#fff; }
+.cmp thead th:first-child { border-top-left-radius:calc(var(--r-lg) - 1px); } .cmp thead th:last-child { border-top-right-radius:calc(var(--r-lg) - 1px); }
+.hhead { display:flex; align-items:center; gap:12px; padding:10px 16px; background:var(--head); color:#fff; font-size:.78rem; font-weight:600; }
+.hhead .hh-main { flex:1; min-width:0; } .hhead .hh-mark { width:30px; text-align:center; overflow:visible; white-space:nowrap; } .hhead .hh-btn { width:44px; text-align:center; }
+@media (max-width:520px) { .hhead { gap:8px; padding:10px 12px; } }
+.hist-body { padding-top:0; }
+.hist-body .filters { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; padding:1rem 1rem 0; align-items:end; }
+.hist-body .hhead { margin-top:-.0rem; }
+.rbar { background:var(--head); border-bottom:0; padding:10px 12px; }
+.toolbar { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.toolbar button { background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.35); color:#fff; }
+.toolbar button:hover:not(:disabled) { background:rgba(255,255,255,.32); border-color:rgba(255,255,255,.5); }
+.toolbar .ico { color:#fff; }
+.mv.b { background:var(--cocoa); border-color:var(--cocoa); color:#fff; } .mv.b .g { color:#fff; }
 </style>
 </head>
 <body>
@@ -731,7 +749,7 @@ function historyRow(g) {
     <a class="hmain" href="#match/${g.id}" aria-label="Detail ${esc(g.game_code)}: lawan ${name(opp)}, ${outcome[2]}">
       ${avatar(player(opp)?.avatar)}
       <span class="htext"><b>${name(opp)}</b>
-        <small>${shortDate(g.finished_at)} · ${duration(g.duration_seconds)} <span class="hmoves"> · ${g.total_moves ?? 0} langkah</span></small></span>
+        <small>${shortDate(g.finished_at)} · ${duration(g.duration_seconds)} <span class="hmoves"> · ${g.total_rolls ?? 0} lemparan</span></small></span>
     </a>
     <span class="mark ${outcome[0]}" title="${outcome[2]}" role="img" aria-label="${outcome[2]}">${outcome[1]}</span>
     <a class="button replay" href="#replay/${g.id}" aria-label="Replay ${esc(g.game_code)}" title="Replay">
@@ -849,27 +867,16 @@ function paintHistory(data) {
   const SORTS = [['newest', 'Terbaru'], ['oldest', 'Terlama dulu'], ['longest', 'Durasi terpanjang'], ['shortest', 'Durasi terpendek']];
   const labelOf = (list, v) => (list.find(x => x[0] === v) || list[0])[1];
   box.innerHTML = `<div class="hist-body"><div class="filters">
-    <button type="button" class="ghost" id="openFilter">${icon('filter')}<span>Filter &amp; urutkan</span></button>
-    <span class="muted">${labelOf(FILTERS, historyQuery.filter)} · ${labelOf(SORTS, historyQuery.sort)}</span></div>
-    ${rows.length ? `<div class="hlist">${rows.map(historyRow).join('')}</div>`
+    <label>Filter<select id="fFilter">${options(FILTERS, historyQuery.filter)}</select></label>
+    <label>Urutkan<select id="fSort">${options(SORTS, historyQuery.sort)}</select></label></div>
+    ${rows.length ? `<div class="hhead"><span class="hh-main">Pertandingan</span><span class="hh-mark">Hasil</span><span class="hh-btn">Replay</span></div><div class="hlist">${rows.map(historyRow).join('')}</div>`
       : '<div class="card center">Belum ada pertandingan. Mulai satu dari Play.</div>'}
     <div class="row between"><button class="ghost" id="prev" ${data.page <= 1 ? 'disabled' : ''}>Sebelumnya</button>
     <span class="muted">Halaman ${data.page} / ${data.pages}</span>
     <button class="ghost" id="next" ${data.page >= data.pages || rows.length < data.games.length ? 'disabled' : ''}>Berikutnya</button></div></div>`;
   const go = change => { if (change.page > 1) historyAll = true; Object.assign(historyQuery, change); reloadHistory(); };
-  $('#openFilter').onclick = () => {
-    const o = document.createElement('div');
-    o.id = 'filterCard'; o.className = 'profile-card'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', 'Filter dan urutkan');
-    o.innerHTML = `<form class="stack pf-box" style="gap:1rem"><h3 style="margin:0">Filter &amp; urutkan</h3>
-      <label>Filter<select id="fFilter">${options(FILTERS, historyQuery.filter)}</select></label>
-      <label>Urutkan<select id="fSort">${options(SORTS, historyQuery.sort)}</select></label>
-      <div class="row"><button>Terapkan</button><button type="button" class="ghost" id="fCancel">Batal</button></div></form>`;
-    document.body.appendChild(o); document.body.classList.add('modal-open');
-    const close = () => { o.remove(); document.body.classList.remove('modal-open'); };
-    o.querySelector('#fCancel').onclick = close;
-    o.querySelector('form').onsubmit = e => { e.preventDefault(); const f = o.querySelector('#fFilter').value, s = o.querySelector('#fSort').value; close(); go({ filter: f, sort: s, page: 1 }); };
-    o.querySelector('#fFilter').focus();
-  };
+  const applyFilter = () => go({ filter: $('#fFilter').value, sort: $('#fSort').value, page: 1 });
+  $('#fFilter').onchange = applyFilter; $('#fSort').onchange = applyFilter;
   $('#prev').onclick = () => go({ page: data.page - 1 });
   $('#next').onclick = () => go({ page: data.page + 1 });
 }
@@ -940,8 +947,7 @@ const pages = {
             <a class="button" href="#home">${icon('home')}<span>Home</span></a></div></div>
         <div class="replay-wrap"><div id="rboard"></div>
           <div class="panel"><div class="rbar"><div class="toolbar" role="group" aria-label="Kontrol replay">
-            ${[['first', 'Awal', 'first'], ['back', 'Sebelumnya', 'prev'], ['play', 'Play', 'play', ''], ['pause', 'Pause', 'pause'],
-               ['fwd', 'Berikutnya', 'next'], ['end', 'Akhir', 'end']].map(btn).join('')}</div></div>
+            ${[['back', 'Sebelumnya', 'prev'], ['toggle', 'Play', 'play'], ['fwd', 'Berikutnya', 'next']].map(btn).join('')}</div></div>
             <div class="mlist" id="mlist">${rowsHtml || '<div class="center">Belum ada langkah.</div>'}</div></div></div></div>`;
       $('#rematch').onclick = () => run(async () => {
         await rpc('create_match', { p_color: g.player_white === boot.me ? 'b' : 'w', p_rematch_of: g.id });
@@ -957,12 +963,19 @@ const pages = {
           else if (cur.offsetTop + cur.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = cur.offsetTop + cur.offsetHeight - list.clientHeight;
         }
       };
-      const stop = () => clearInterval(replayTimer);
+      let playing = false;
+      const syncPlay = () => { const t = view.querySelector('[data-r="toggle"]'); if (!t) return;
+        t.innerHTML = icon(playing ? 'pause' : 'play'); t.setAttribute('aria-label', playing ? 'Pause' : 'Play'); t.title = playing ? 'Pause' : 'Play'; };
+      const stop = () => { clearInterval(replayTimer); playing = false; syncPlay(); };
       const actions = {
-        first: () => { stop(); at = 0; }, back: () => { stop(); at = Math.max(0, at - 1); },
+        back: () => { stop(); at = Math.max(0, at - 1); },
         fwd: () => { stop(); at = Math.min(frames.length - 1, at + 1); },
-        end: () => { stop(); at = frames.length - 1; }, pause: stop,
-        play: () => { stop(); if (at >= frames.length - 1) at = 0; replayTimer = setInterval(() => { if (at >= frames.length - 1) return stop(); at++; draw(); }, 900); },
+        toggle: () => {
+          if (playing) return stop();
+          if (at >= frames.length - 1) at = 0;
+          playing = true; syncPlay();
+          replayTimer = setInterval(() => { if (at >= frames.length - 1) return stop(); at++; draw(); }, 900);
+        },
       };
       view.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { actions[b.dataset.r](); draw(); });
       const jump = e => { const c = e.target.closest('.mvc'); if (c) { stop(); at = +c.dataset.f; draw(); } };
