@@ -801,6 +801,26 @@ body:not(.playing) #secSetup.playcard {
   #setupBody > .setup-bubble #create { width:calc(100% - 6px); margin-left:3px; margin-right:3px; }
 }
 
+
+/* ==== Update: daftar langkah menampilkan 5 baris dan bidak hitam senada header ==== */
+.replay-wrap > .panel .mlist {
+  height:270px;
+  max-height:270px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.replay-wrap > .panel .mrow {
+  height:54px;
+  min-height:54px;
+}
+.replay-wrap .mv.b {
+  background:linear-gradient(180deg,var(--tan1),var(--tan2));
+  border-color:var(--tan-line);
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 2px 6px rgba(94,63,43,.12);
+}
+.replay-wrap .mv.b .g { color:#fff; }
+
 </style>
 </head>
 <body>
