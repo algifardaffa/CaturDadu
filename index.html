@@ -830,7 +830,7 @@ body:not(.playing) #secSetup.playcard {
 .cmp thead th.num,
 .hist-body .filters,
 .hhead {
-  background:#985E49 !important;
+  background:#725840 !important;
   color:#FFF8F3 !important;
 }
 .hist-body .filters > label { color:#FFF8F3 !important; }
@@ -843,21 +843,21 @@ body:not(.playing) #secSetup.playcard {
 /* Rematch + Home use terracotta */
 .match-summary button.ghost,
 .match-summary .actions2 button#rematch {
-  background:linear-gradient(180deg,#985E49 0%,#824D3D 100%) !important;
-  border:1px solid #744536 !important;
+  background:linear-gradient(180deg,#725840 0%,#624B36 100%) !important;
+  border:1px solid #5D452F !important;
   color:#FFF8F3 !important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 3px 9px rgba(67,45,39,.13);
 }
 .match-summary a.button[href="#home"],
 .match-summary a.button:not(.ghost) {
-  background:linear-gradient(180deg,#985E49 0%,#824D3D 100%) !important;
-  border:1px solid #744536 !important;
+  background:linear-gradient(180deg,#725840 0%,#624B36 100%) !important;
+  border:1px solid #5D452F !important;
   color:#FFF8F3 !important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 3px 9px rgba(67,45,39,.13);
 }
 .match-summary button.ghost:hover:not(:disabled),
 .match-summary a.button[href="#home"]:hover {
-  background:linear-gradient(180deg,#874F3E 0%,#704133 100%) !important;
+  background:linear-gradient(180deg,#654B36 0%,#543E2D 100%) !important;
 }
 
 /* Replay previous, play and next controls: deep espresso like Start/Replay */
@@ -926,7 +926,27 @@ body:not(.playing) #secSetup.playcard {
 }
 #setupBody > .setup-bubble .colorbtn[aria-checked="true"] {
   background:#FFFFFF !important;
-  border-color:#985E49 !important;
+  border-color:#725840 !important;
+}
+
+
+
+/* Restore alternating row colors in the move list, matching Versus/History.
+   The individual move bubbles remain white. */
+.replay-wrap > .panel .mlist {
+  background:#F3E4DA !important;
+}
+.replay-wrap > .panel .mrow,
+.replay-wrap > .panel .mrow:nth-child(odd) {
+  background:#F3E4DA !important;
+}
+.replay-wrap > .panel .mrow:nth-child(even) {
+  background:#EBD5C9 !important;
+}
+.replay-wrap .mv,
+.replay-wrap .mv.w,
+.replay-wrap .mv.b {
+  background:#FFFFFF !important;
 }
 
 </style>
