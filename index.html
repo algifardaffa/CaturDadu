@@ -348,6 +348,10 @@ select, input { font-size:14px; min-height:44px; }
 .actions3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
 .actions3 .button, .actions3 button { font-size:11px; min-height:40px; padding:8px 6px; gap:6px; white-space:nowrap; }
 .actions3 .ico { width:16px; height:16px; }
+
+/* Tombol <a> primer: ikon dan teks putih (sebelumnya kalah oleh warna tautan sehingga cokelat di atas cokelat) */
+a.button:not(.ghost), a.button:not(.ghost):hover, .button.replay, .button.replay:hover { color:#fff; }
+.button.replay .ico { color:#fff; }
 </style>
 </head>
 <body>
