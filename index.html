@@ -368,6 +368,39 @@ a.button:not(.ghost), a.button:not(.ghost):hover, .button.replay, .button.replay
 .replay-wrap .panel { margin-top:0; }
 .actions2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
 .actions2 .button, .actions2 button { font-size:12px; min-height:40px; white-space:nowrap; }
+
+/* ==== Revisi: detail+replay satu halaman, filter card, online counter ==== */
+.replay-wrap { max-width:none; }
+.replay-wrap #rboard .board { width:100%; max-width:none; margin:0; }
+.toolbar { grid-template-columns:repeat(6,minmax(0,1fr)); }
+.mlist { position:relative; max-height:260px; overflow-y:auto; overscroll-behavior:contain; }
+.mrow { display:flex; align-items:center; gap:10px; padding:4px 14px; min-height:52px; background:var(--surface); }
+.mrow:nth-child(even) { background:var(--tint); }
+.mnum { width:20px; flex:none; color:var(--warm); font-weight:600; font-variant-numeric:tabular-nums; }
+.mchips { display:flex; flex-wrap:nowrap; gap:2px; min-width:0; }
+.mvc { padding:4px; border-radius:14px; cursor:pointer; }
+.mvc.cur { background:rgba(169,130,97,.4); }
+.mv { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:66px; padding:7px 10px; border-radius:10px; border:1px solid var(--sand);
+  font-weight:600; font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.mv .g { font:20px/1 "Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans",serif; }
+.mv.w { background:#fff; color:var(--cocoa); } .mv.w .g { color:#fff; -webkit-text-stroke:1.2px var(--cocoa); }
+.mv.b { background:#2B1D13; border-color:#2B1D13; color:#F4EEE5; } .mv.b .g { color:#F4EEE5; }
+.mv.none { font-weight:500; opacity:.75; }
+.hist-body .filters { display:flex; align-items:center; gap:12px; }
+.hist-body .filters .muted { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:420px) { .conn { font-size:11px; padding:6px 10px; width:auto; gap:6px; } }
+.actions2 button.big, .actions2 .big { min-height:44px; font-size:13px; }
+
+/* ==== Revisi: replay ala sketsa (5 baris terlihat, kolom berwarna sesuai bidak, highlight bubble cokelat) ==== */
+.replay-wrap, .replay-wrap #rboard, .replay-wrap .panel { width:100%; }
+.mlist { max-height:260px; overflow-y:auto; }
+.mrow { height:52px; min-height:52px; box-sizing:border-box; padding:4px 12px; gap:8px; }
+.mchips { flex:1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.mvc { padding:0; border-radius:12px; min-width:0; transition:background .15s, box-shadow .15s; }
+.mv { display:flex; width:100%; min-width:0; box-sizing:border-box; padding:6px 4px; border-radius:10px; }
+.mvc.cur { background:rgba(139,94,60,.38); box-shadow:0 0 0 4px rgba(139,94,60,.38); }
+.actions2 { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px; }
+.actions2 > * { width:100%; min-width:0; }
 </style>
 </head>
 <body>
@@ -423,6 +456,7 @@ const ICONS = {
   cross: '<path d="M6 6l12 12M18 6 6 18"/>',
   percent: '<path d="M18 5 6 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
   equal: '<path d="M5 9h14M5 15h14"/>',
+  filter: '<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2.5"/><circle cx="9" cy="12" r="2.5"/><circle cx="17" cy="18" r="2.5"/>',
   flame: '<path d="M12 3c1 5 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 3-6 1 2 2 2 2 2 1-2 0-5 1-7z"/>',
   play: '<path d="M8 5v14l11-7z" fill="currentColor"/>',
   pause: '<path d="M8 5v14M16 5v14" stroke-width="3.5"/>',
@@ -722,8 +756,8 @@ function paintSetup() {
       box.innerHTML = `<div class="card stack wavy">${waveHtml()}
         <div class="versus-row">${side(me, 'Kamu')}<div class="vs" aria-hidden="true">VS</div>
           ${side(other, other ? presence(other.id) : 'Offline')}</div>
-        <div><span class="field-label" id="colorLbl">Warnamu</span>
-          <div class="colorseg" role="radiogroup" aria-labelledby="colorLbl">${[['w', 'Putih', 'Putih (jalan dulu)'], ['random', 'Acak', 'Acak'], ['b', 'Hitam', 'Hitam']].map(([v, l, t]) =>
+        <div>
+          <div class="colorseg" role="radiogroup" aria-label="Pilih warna">${[['w', 'Putih', 'Putih (jalan dulu)'], ['random', 'Acak', 'Acak'], ['b', 'Hitam', 'Hitam']].map(([v, l, t]) =>
             `<button type="button" class="ghost colorbtn" role="radio" data-color="${v}" aria-checked="false" aria-label="${t}"><span class="knight k-${v}" aria-hidden="true">♞&#xFE0E;</span><small>${l}</small></button>`).join('')}</div>
           <input type="hidden" id="color" value="w"></div>
         <button id="create" class="big">${icon('swords')} Buat pertandingan</button></div>`;
@@ -741,8 +775,8 @@ function paintSetup() {
       box.innerHTML = `<div class="card stack wavy">${waveHtml()}<div class="versus-row">${who(g.player_white, 'Putih · ' + status(g.player_white))}
         <div class="vs" aria-hidden="true">VS</div>${who(g.player_black, 'Hitam · ' + status(g.player_black))}</div>
         <p class="note">${mine ? 'Menunggu lawan menerima…' : 'Kamu diajak bermain.'}</p>
-        ${mine ? '' : '<button class="big" data-act="accept">Terima</button>'}
-        <button class="ghost big" data-act="cancel">${mine ? 'Batalkan' : 'Tolak'}</button></div>`;
+        ${mine ? '<button class="ghost big" data-act="cancel">Batalkan</button>'
+          : '<div class="actions2"><button class="big" data-act="accept">Terima</button><button class="ghost big" data-act="cancel">Tolak</button></div>'}</div>`;
     } else {
       const myTurn = live.turn.player_id === boot.me, roll = live.roll;
       const needRoll = myTurn && !roll;
@@ -811,19 +845,31 @@ function paintHistory(data) {
   more.textContent = historyAll ? 'Ringkas' : 'Lihat semua →';
   more.setAttribute('aria-expanded', String(historyAll));
   more.onclick = () => { historyAll = !historyAll; paintHistory(data); };
+  const FILTERS = [['all', 'Semua match'], [ 'p1', name(a.id) + ' menang'], ['p2', name(b.id) + ' menang'], ['draw', 'Remis'], ['abandoned', 'Abandoned']];
+  const SORTS = [['newest', 'Terbaru'], ['oldest', 'Terlama dulu'], ['longest', 'Durasi terpanjang'], ['shortest', 'Durasi terpendek']];
+  const labelOf = (list, v) => (list.find(x => x[0] === v) || list[0])[1];
   box.innerHTML = `<div class="hist-body"><div class="filters">
-    <label>Filter<select id="filter">${options([['all', 'Semua match'], ['p1', name(a.id) + ' menang'],
-      ['p2', name(b.id) + ' menang'], ['draw', 'Remis'], ['abandoned', 'Abandoned']], historyQuery.filter)}</select></label>
-    <label>Urutkan<select id="sort">${options([['newest', 'Terbaru'], ['oldest', 'Terlama dulu'],
-      ['longest', 'Durasi terpanjang'], ['shortest', 'Durasi terpendek']], historyQuery.sort)}</select></label></div>
+    <button type="button" class="ghost" id="openFilter">${icon('filter')}<span>Filter &amp; urutkan</span></button>
+    <span class="muted">${labelOf(FILTERS, historyQuery.filter)} · ${labelOf(SORTS, historyQuery.sort)}</span></div>
     ${rows.length ? `<div class="hlist">${rows.map(historyRow).join('')}</div>`
       : '<div class="card center">Belum ada pertandingan. Mulai satu dari Play.</div>'}
     <div class="row between"><button class="ghost" id="prev" ${data.page <= 1 ? 'disabled' : ''}>Sebelumnya</button>
     <span class="muted">Halaman ${data.page} / ${data.pages}</span>
     <button class="ghost" id="next" ${data.page >= data.pages || rows.length < data.games.length ? 'disabled' : ''}>Berikutnya</button></div></div>`;
   const go = change => { if (change.page > 1) historyAll = true; Object.assign(historyQuery, change); reloadHistory(); };
-  $('#filter').onchange = e => go({ filter: e.target.value, page: 1 });
-  $('#sort').onchange = e => go({ sort: e.target.value, page: 1 });
+  $('#openFilter').onclick = () => {
+    const o = document.createElement('div');
+    o.id = 'filterCard'; o.className = 'profile-card'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', 'Filter dan urutkan');
+    o.innerHTML = `<form class="stack pf-box" style="gap:1rem"><h3 style="margin:0">Filter &amp; urutkan</h3>
+      <label>Filter<select id="fFilter">${options(FILTERS, historyQuery.filter)}</select></label>
+      <label>Urutkan<select id="fSort">${options(SORTS, historyQuery.sort)}</select></label>
+      <div class="row"><button>Terapkan</button><button type="button" class="ghost" id="fCancel">Batal</button></div></form>`;
+    document.body.appendChild(o); document.body.classList.add('modal-open');
+    const close = () => { o.remove(); document.body.classList.remove('modal-open'); };
+    o.querySelector('#fCancel').onclick = close;
+    o.querySelector('form').onsubmit = e => { e.preventDefault(); const f = o.querySelector('#fFilter').value, s = o.querySelector('#fSort').value; close(); go({ filter: f, sort: s, page: 1 }); };
+    o.querySelector('#fFilter').focus();
+  };
   $('#prev').onclick = () => go({ page: data.page - 1 });
   $('#next').onclick = () => go({ page: data.page + 1 });
 }
@@ -875,32 +921,28 @@ const pages = {
     }
     return () => {
       let at = 0;
-      const turn = i => d.turns.find(t => t.id === i);
       const owner = p => p === g.player_white ? 'w' : 'b';
       const pair = g.winner
         ? [[g.winner, 'Pemenang'], [g.winner === g.player_white ? g.player_black : g.player_white, 'Kalah']]
         : [g.player_white, g.player_black].map(p => [p, g.status === 'abandoned' ? 'Abandoned' : g.status === 'completed' ? 'Remis' : 'Bermain']);
       const btn = ([k, label, ic, cls]) => `<button type="button" class="${cls || 'ghost'}" data-r="${k}" aria-label="${label}" title="${label}">${icon(ic)}</button>`;
+      const chip = (f, i) => { const m = f.move, o = owner(f.roll.player_id);
+        return `<span class="mvc" data-f="${i}" role="button" tabindex="0" aria-label="Langkah ${m ? esc(m.move_san) : 'dilewati'}"><span class="mv ${o}${m ? '' : ' none'}">${m
+          ? `<span class="g">${glyph(m.piece_type)}</span>${m.captured_piece ? '×' : ''}${m.to_square}` : 'Lewati'}</span></span>`; };
+      const rowsHtml = d.turns.map(t => {
+        const cells = frames.map((f, i) => [f, i]).filter(([f]) => f.turn && f.turn.id === t.id);
+        return cells.length ? `<div class="mrow"><span class="mnum">${t.turn_number}</span><div class="mchips">${cells.map(([f, i]) => chip(f, i)).join('')}</div></div>` : '';
+      }).join('');
       view.innerHTML = `<div class="stack">
         <div class="card stack wavy">${waveHtml()}<h1 style="margin:0">${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</h1>
           <div class="versus-row">${who(pair[0][0], pair[0][1])}<div class="vs" aria-hidden="true">VS</div>${who(pair[1][0], pair[1][1])}</div>
           <div class="actions2"><button id="rematch" class="ghost" title="Main lagi dengan warna tertukar" ${live ? 'disabled' : ''}>${icon('swap')}<span>Rematch</span></button>
             <a class="button" href="#home">${icon('home')}<span>Home</span></a></div></div>
-        <section><div class="title-row"><h2>${icon('play')}Replay</h2></div>
-          <div class="replay-wrap"><div id="rboard"></div>
-            <div class="panel"><div class="rbar"><div class="toolbar" role="group" aria-label="Kontrol replay">
-              ${[['first', 'Awal', 'first'], ['back', 'Sebelumnya', 'prev'], ['play', 'Play', 'play', ''], ['pause', 'Pause', 'pause'],
-                 ['fwd', 'Berikutnya', 'next'], ['end', 'Akhir', 'end'], ['restart', 'Ulang', 'restart']].map(btn).join('')}</div></div>
-              <div class="cmp-scroll"><table class="zt"><tbody id="rinfo"></tbody></table></div></div></div></section>
-        <section><div class="title-row"><h2>${icon('clock')}Detail giliran</h2></div>
-          <div class="panel"><div class="cmp-scroll"><table class="zt">
-          <thead><tr><th>Giliran</th><th>Pemain</th><th>Dadu</th><th>Langkah</th><th>Dimakan</th></tr></thead><tbody>
-          ${d.rolls.map(r => { const ms = d.moves.filter(m => m.turn_id === r.turn_id);
-            return `<tr><td>${turn(r.turn_id).turn_number}</td><td>${name(r.player_id)}</td>
-            <td><span class="dice-line">${diceGlyphs(r.dice_values, owner(r.player_id))}</span></td>
-            <td>${ms.map(m => esc(m.move_san)).join(', ') || 'tidak ada'}</td>
-            <td>${ms.filter(m => m.captured_piece).map(m => NAMES[m.captured_piece]).join(', ') || '—'}</td></tr>`; }).join('')
-            || '<tr><td colspan="5">Belum ada lemparan dadu.</td></tr>'}</tbody></table></div></div></section></div>`;
+        <div class="replay-wrap"><div id="rboard"></div>
+          <div class="panel"><div class="rbar"><div class="toolbar" role="group" aria-label="Kontrol replay">
+            ${[['first', 'Awal', 'first'], ['back', 'Sebelumnya', 'prev'], ['play', 'Play', 'play', ''], ['pause', 'Pause', 'pause'],
+               ['fwd', 'Berikutnya', 'next'], ['end', 'Akhir', 'end']].map(btn).join('')}</div></div>
+            <div class="mlist" id="mlist">${rowsHtml || '<div class="center">Belum ada langkah.</div>'}</div></div></div></div>`;
       $('#rematch').onclick = () => run(async () => {
         await rpc('create_match', { p_color: g.player_white === boot.me ? 'b' : 'w', p_rematch_of: g.id });
         location.hash = 'home';
@@ -908,23 +950,24 @@ const pages = {
       const draw = () => {
         const f = frames[at], m = f.move;
         $('#rboard').innerHTML = boardHtml(f.fen, { flip: flipFor(g.player_white), last: m ? [m.from_square, m.to_square] : [] });
-        const o = f.roll ? owner(f.roll.player_id) : 'w';
-        const rows = [['Bingkai', `${at} / ${frames.length - 1}`],
-          ['Langkah', `${frames.slice(0, at + 1).filter(y => y.move).length} / ${d.moves.length}`],
-          ...(f.roll ? [['Giliran', `${f.turn.turn_number} · ${name(f.turn.player_id)}`],
-            ['Dadu', diceHtml(f.roll.dice_values, f.used, false, o)],
-            ['Gerakan', m ? `<span class="piece-${o}">${glyph(m.piece_type)}</span> ${esc(m.move_san)}${m.captured_piece ? ` · memakan ${glyph(m.captured_piece)}` : ''}` : 'Tidak ada langkah legal']]
-            : [['Posisi', 'Posisi awal']])];
-        $('#rinfo').innerHTML = rows.map(([k, v]) => `<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('');
+        view.querySelectorAll('.mvc').forEach(el => el.classList.toggle('cur', +el.dataset.f === at));
+        const cur = view.querySelector('.mvc.cur'), list = $('#mlist');
+        if (cur && list) {   // gulir di dalam daftar saja, bukan halaman
+          if (cur.offsetTop < list.scrollTop) list.scrollTop = cur.offsetTop;
+          else if (cur.offsetTop + cur.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = cur.offsetTop + cur.offsetHeight - list.clientHeight;
+        }
       };
       const stop = () => clearInterval(replayTimer);
       const actions = {
         first: () => { stop(); at = 0; }, back: () => { stop(); at = Math.max(0, at - 1); },
         fwd: () => { stop(); at = Math.min(frames.length - 1, at + 1); },
-        end: () => { stop(); at = frames.length - 1; }, pause: stop, restart: () => { stop(); at = 0; },
-        play: () => { stop(); replayTimer = setInterval(() => { if (at >= frames.length - 1) return stop(); at++; draw(); }, 900); },
+        end: () => { stop(); at = frames.length - 1; }, pause: stop,
+        play: () => { stop(); if (at >= frames.length - 1) at = 0; replayTimer = setInterval(() => { if (at >= frames.length - 1) return stop(); at++; draw(); }, 900); },
       };
       view.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { actions[b.dataset.r](); draw(); });
+      const jump = e => { const c = e.target.closest('.mvc'); if (c) { stop(); at = +c.dataset.f; draw(); } };
+      $('#mlist').onclick = jump;
+      $('#mlist').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jump(e); } };
       draw();
     };
   },
@@ -1114,7 +1157,7 @@ function paintConn() {
   const el = $('#conn');
   if (!el) return;
   el.className = `conn ${connState}`;
-  el.textContent = { ok: 'Online', bad: 'Offline', connecting: 'Menyambung' }[connState];
+  el.textContent = connState === 'ok' ? `${new Set([...online, boot.me].filter(Boolean)).size} online` : { bad: 'Offline', connecting: 'Menyambung' }[connState];
 }
 // "Champion" = pemain dengan kemenangan terbanyak (tidak ada bila seri).
 function isChampion() {
@@ -1225,6 +1268,7 @@ function setupRealtime() {
     const next = Object.keys(presence.presenceState()).sort();
     if (next.join() === [...online].sort().join()) return;
     online = next;
+    paintConn();
     if (isHome() && !busy) paintSetup();
   }).subscribe(async status => { if (status === 'SUBSCRIBED') await presence.track({ at: Date.now() }); });
   channels = [games, presence];
