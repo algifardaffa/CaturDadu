@@ -571,6 +571,60 @@ body:not(.playing) #secSetup.playcard {
 .hist-body .filters > label { color:rgba(255,255,255,.96); }
 .hist-body .filters select { background:#FFFCF9; border:1px solid rgba(255,255,255,.75); color:var(--cocoa); }
 @media (max-width:520px) { #setupBody .versus-row .avatar { width:46px; height:46px; } }
+
+/* Final layout refinement: setup bubble only around the matchup controls. */
+#setupBody > .setup-bubble {
+  background:linear-gradient(180deg,#FBF3ED 0%,#EAD7C8 100%);
+  border:1px solid rgba(169,130,97,.18);
+  border-radius:26px;
+  padding:16px 14px 14px;
+  box-shadow:0 6px 20px rgba(94,63,43,.08), inset 0 1px 0 rgba(255,255,255,.82);
+  gap:12px;
+}
+#setupBody > .setup-bubble > .wave-clip { display:block; border-radius:26px; }
+#setupBody .versus-row { background:transparent; border:0; border-radius:0; padding:0 2px; box-shadow:none; backdrop-filter:none; }
+#setupBody .versus-row .vs { background:#FBF3EC; box-shadow:0 2px 8px rgba(94,63,43,.10); }
+
+/* Match result: retain one warm summary bubble, not a bubble around the whole replay page. */
+.match-page { display:flex; flex-direction:column; gap:14px; }
+.match-summary {
+  background:linear-gradient(180deg,#FBF3ED 0%,#DCC8B8 100%);
+  border:1px solid rgba(169,130,97,.18); border-radius:26px; padding:16px 14px 14px;
+  box-shadow:0 6px 20px rgba(94,63,43,.08), inset 0 1px 0 rgba(255,255,255,.82);
+  gap:12px;
+}
+.match-summary > .wave-clip { display:block; border-radius:26px; }
+.match-summary .versus-row {
+  background:transparent; border:0; border-radius:0; padding:2px 2px 6px; box-shadow:none;
+  -webkit-backdrop-filter:none; backdrop-filter:none; gap:8px;
+}
+.match-summary .versus-row .row { flex-direction:row; text-align:left; align-items:center; gap:10px; }
+.match-summary .versus-row .row > div { width:auto; min-width:0; }
+.match-summary .versus-row .avatar { width:58px; height:58px; border:2px solid rgba(255,255,255,.85); box-shadow:0 2px 8px rgba(94,63,43,.14); }
+.match-summary .versus-row strong { font-size:14px; }
+.match-summary .versus-row .muted { font-size:13px; color:#8C796B; }
+.match-summary .vs { width:42px; height:42px; background:#FBF8F3; border:0; box-shadow:none; color:#80634E; font-size:14px; }
+.match-summary .actions2 .button, .match-summary .actions2 button { min-height:52px; border-radius:17px; font-size:15px; }
+.match-summary button.ghost { background:#FFFCF9; border:1px solid #EBDCCF; color:#5A4030; }
+.match-summary a.button:not(.ghost) { background:linear-gradient(180deg,#5A4030,#45372F); border:1px solid #45372F; color:#fff; }
+
+/* Replay controls match the supplied caramel three-dimensional buttons. */
+.replay-wrap .rbar { background:transparent; border:0; padding:0; }
+.replay-wrap .toolbar { grid-template-columns:repeat(3,minmax(0,1fr)); gap:2px; }
+.replay-wrap .toolbar button {
+  min-height:52px; border-radius:18px;
+  background:linear-gradient(180deg,#C9A286 0%,#B68F72 100%);
+  border:1px solid #AD8668; color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.48), inset 0 -1px 0 rgba(119,78,52,.12), 0 3px 7px rgba(133,87,60,.22);
+}
+.replay-wrap .toolbar button:hover:not(:disabled) { background:linear-gradient(180deg,#CEAA8F 0%,#BD977A 100%); }
+.replay-wrap .toolbar button .ico { color:#fff; width:22px; height:22px; }
+@media (max-width:520px) {
+  .match-summary { padding:14px 12px 12px; }
+  .match-summary .versus-row .avatar { width:46px; height:46px; }
+  .match-summary .versus-row strong { font-size:12px; }
+  .match-summary .versus-row .muted { font-size:11px; }
+}
 </style>
 </head>
 <body>
@@ -924,7 +978,7 @@ function paintSetup() {
       const chosen = $('#color')?.value;
       const me = player(boot.me), other = boot.players.find(p => p.id !== boot.me);
       const side = (p, extra) => p ? who(p.id, extra) : '<div class="row"><div><strong>Belum ada lawan</strong></div></div>';
-      box.innerHTML = `<div class="card stack wavy">${waveHtml()}
+      box.innerHTML = `<div class="card stack wavy setup-bubble">${waveHtml()}
         <div class="versus-row">${side(me, 'Kamu')}<div class="vs" aria-hidden="true">VS</div>
           ${side(other, other ? presence(other.id) : 'Offline')}</div>
         <div>
@@ -1093,8 +1147,8 @@ const pages = {
         const cells = frames.map((f, i) => [f, i]).filter(([f]) => f.turn && f.turn.id === t.id);
         return cells.length ? `<div class="mrow"><span class="mnum">${t.turn_number}</span><div class="mchips">${cells.map(([f, i]) => chip(f, i)).join('')}</div></div>` : '';
       }).join('');
-      view.innerHTML = `<div class="bubble stack">
-        <div class="card stack wavy">${waveHtml()}<h1 class="ttl" style="margin:0">${icon('crown')}<span>${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</span></h1>
+      view.innerHTML = `<div class="match-page">
+        <div class="card stack wavy match-summary">${waveHtml()}<h1 class="ttl" style="margin:0">${icon('crown')}<span>${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</span></h1>
           <div class="versus-row">${who(pair[0][0], pair[0][1])}<div class="vs" aria-hidden="true">VS</div>${who(pair[1][0], pair[1][1])}</div>
           <div class="actions2"><button id="rematch" class="ghost" title="Main lagi dengan warna tertukar" ${live ? 'disabled' : ''}>${icon('swap')}<span>Rematch</span></button>
             <a class="button" href="#home">${icon('home')}<span>Home</span></a></div></div>
