@@ -749,7 +749,7 @@ function historyRow(g) {
     <a class="hmain" href="#match/${g.id}" aria-label="Detail ${esc(g.game_code)}: lawan ${name(opp)}, ${outcome[2]}">
       ${avatar(player(opp)?.avatar)}
       <span class="htext"><b>${name(opp)}</b>
-        <small>${shortDate(g.finished_at)} · ${duration(g.duration_seconds)} <span class="hmoves"> · ${g.total_rolls ?? 0} lemparan</span></small></span>
+        <small>${shortDate(g.finished_at)} · ${duration(g.duration_seconds)} <span class="hmoves"> · ${g.total_dice_rolls ?? 0} lemparan</span></small></span>
     </a>
     <span class="mark ${outcome[0]}" title="${outcome[2]}" role="img" aria-label="${outcome[2]}">${outcome[1]}</span>
     <a class="button replay" href="#replay/${g.id}" aria-label="Replay ${esc(g.game_code)}" title="Replay">
