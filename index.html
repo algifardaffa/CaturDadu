@@ -821,6 +821,93 @@ body:not(.playing) #secSetup.playcard {
 }
 .replay-wrap .mv.b .g { color:#fff; }
 
+
+
+/* ==== Penyelarasan visual: Play putih bergelombang, move bubble putih, tombol lebih subtle ==== */
+
+/* Bubble Play tetap menampilkan wave, tetapi permukaan dasarnya putih bersih. */
+#setupBody > .setup-bubble {
+  background:#fff;
+  border-color:#EAE2DA;
+  box-shadow:0 5px 18px rgba(73,51,35,.055), inset 0 1px 0 rgba(255,255,255,.95);
+}
+#setupBody > .setup-bubble > .wave-clip { opacity:.72; }
+#setupBody > .setup-bubble .wave {
+  color:#C6A88F;
+}
+#setupBody > .setup-bubble .wave .w1 path { fill-opacity:.16; }
+#setupBody > .setup-bubble .wave .w2 path { fill-opacity:.09; }
+#setupBody > .setup-bubble .wave .w3 path { stroke-opacity:.42; }
+
+/* Semua bubble langkah memakai putih; warna bidak hitam membedakan giliran hitam. */
+.replay-wrap .mv.w,
+.replay-wrap .mv.b {
+  background:#fff;
+  border:1px solid #E9E1D9;
+  color:var(--cocoa);
+  box-shadow:0 1px 3px rgba(73,51,35,.035);
+}
+.replay-wrap .mv.w .g {
+  color:#fff;
+  -webkit-text-stroke:1.2px #493323;
+}
+.replay-wrap .mv.b .g {
+  color:#171717;
+  -webkit-text-stroke:0;
+}
+
+/* Tombol utama dibuat lebih lembut, tanpa kontras cokelat yang terlalu dominan. */
+#setupBody > .setup-bubble #create {
+  background:linear-gradient(180deg,#BDA58F 0%,#AA927D 100%);
+  border:1px solid #A58B75;
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 2px 7px rgba(73,51,35,.10);
+}
+#setupBody > .setup-bubble #create:hover:not(:disabled) {
+  background:linear-gradient(180deg,#C5AE99 0%,#B49B86 100%);
+  border-color:#AA927D;
+}
+
+/* Tombol Replay di riwayat: warna taupe lembut, bukan cokelat pekat. */
+.button.replay,
+.button.replay:hover {
+  background:linear-gradient(180deg,#D2C2B4 0%,#C2AF9F 100%);
+  border:1px solid #BDAA99;
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 5px rgba(73,51,35,.09);
+}
+.button.replay:hover:not(:disabled) {
+  background:linear-gradient(180deg,#D9CABC 0%,#CAB8A8 100%);
+  border-color:#BDAA99;
+}
+.button.replay .ico { color:#fff; }
+
+/* Home dibuat seperti secondary action: tetap jelas, tetapi tidak berebut perhatian. */
+.match-summary a.button[href="#home"] {
+  background:#F5F1EC;
+  border:1px solid #E7DED5;
+  color:#766354;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 3px rgba(73,51,35,.04);
+}
+.match-summary a.button[href="#home"]:hover {
+  background:#EEE7DF;
+  border-color:#DCCFC2;
+  color:#5D4939;
+}
+
+/* Kontrol Play/Pause dan navigasi replay juga diturunkan intensitasnya. */
+.replay-wrap .toolbar button {
+  background:linear-gradient(180deg,#D5C5B7 0%,#C5B3A3 100%);
+  border:1px solid #BEAA98;
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 5px rgba(73,51,35,.08);
+}
+.replay-wrap .toolbar button:hover:not(:disabled) {
+  background:linear-gradient(180deg,#DED0C4 0%,#CEBDAE 100%);
+  border-color:#BEAA98;
+}
+.replay-wrap .toolbar button .ico { color:#fff; }
+
 </style>
 </head>
 <body>
