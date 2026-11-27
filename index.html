@@ -1114,6 +1114,44 @@ button[data-act="accept"]:hover:not(:disabled),
 #historyBody .hrow:nth-child(even) { background:#F7EEE7 !important; }
 #historyBody .hist-body > .row.between { background:#FCF7F3 !important; }
 
+
+
+/* ===== Corrective overrides: Rematch + History bubble ===== */
+.match-summary .actions2 > button#rematch,
+.match-summary .actions2 > button#rematch:visited,
+.match-summary .actions2 > button#rematch:hover:not(:disabled),
+.match-summary .actions2 > button#rematch:focus-visible,
+.match-summary .actions2 > button#rematch:disabled {
+  background:#FFFFFF !important;
+  background-image:none !important;
+  border:1px solid #E8DED3 !important;
+  color:#432D27 !important;
+  box-shadow:0 2px 7px rgba(67,45,39,.07) !important;
+  opacity:1;
+}
+
+/* Remove the white strips around the history content, including its outer panel. */
+#historyBody.panel,
+#historyBody .hist-body,
+#historyBody .hlist,
+#historyBody .hist-body > .row.between {
+  background-color:#FCF7F3 !important;
+  background-image:none !important;
+}
+#historyBody.panel {
+  border-color:#E8DED3 !important;
+  overflow:hidden;
+}
+#historyBody .hrow { background-color:#FCF7F3 !important; }
+#historyBody .hrow:nth-child(even) { background-color:#F7EEE7 !important; }
+
+/* History header matches the Head-to-head / Versus table header. */
+#historyBody .hhead {
+  background:#CCBAAC !important;
+  color:#432D27 !important;
+  border-top:0 !important;
+  border-bottom:1px solid #B6A391 !important;
+}
 </style>
 </head>
 <body>
