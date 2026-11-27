@@ -56,7 +56,8 @@ main { padding-bottom:4rem; }
 @media (max-width:380px) { .install-btn .lbl { display:none; } .install-btn { padding:8px 12px; } }
 
 /* kartu profil (muncul saat avatar diketuk) */
-.profile-card { position:absolute; z-index:1000; left:0; top:calc(100% + 10px); width:min(340px, calc(100vw - 2.5rem));
+.profile-card { position:absolute; z-index:1000; left:0; top:calc(100% + 10px); width:min(360px, calc(100vw - 2.5rem));
+  max-height:calc(100vh - 110px); overflow-y:auto; overscroll-behavior:contain;
   padding:1.1rem; background:var(--paper); border:1px solid var(--line-2); border-radius:var(--radius-lg);
   box-shadow:0 20px 50px rgba(46,26,15,.18); display:flex; flex-direction:column; gap:.9rem; }
 .profile-card .avatar.lg { width:60px; height:60px; font-size:30px; }
@@ -145,13 +146,15 @@ ul { padding-left:1.2rem; margin:0; } li { margin:6px 0; font-size:.9rem; }
 .coord.file { right:3px; bottom:1px; } .coord.rank { left:3px; top:1px; }
 
 /* ---- Dadu ---- */
-.die { width:64px; height:64px; border:1px solid var(--line-2); border-radius:var(--radius); background:var(--paper); color:var(--espresso);
+.die { width:68px; height:68px; border:1px solid var(--line-2); border-radius:var(--radius); background:var(--paper); color:var(--espresso);
   display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.1; box-shadow:var(--shadow); }
-.die b { font-size:1.35rem; font-weight:600; color:var(--cocoa); } .die small { font-size:.68rem; color:var(--muted); font-weight:500; }
+.die b { font-size:2.1rem; font-weight:400; line-height:1; color:var(--cocoa); }
+.dice-line { letter-spacing:.2em; font-size:1.05rem; color:var(--cocoa); }
 .die.used { opacity:.45; border-style:dashed; box-shadow:none; }
 .die.rolling { animation:roll .5s ease-out; }
 @keyframes roll { from { transform:rotate(-200deg) scale(.6); } to { transform:none; } }
 .turn { border-left:3px solid var(--cocoa); }
+[data-me] { cursor:pointer; }
 
 /* ---- Status / auth / dialog / toast ---- */
 .center { text-align:center; padding:56px 12px; color:var(--muted); font-size:.9rem; }
@@ -168,7 +171,54 @@ dialog::backdrop { background:rgba(46,26,15,.45); }
 #toast { position:fixed; left:16px; right:16px; bottom:16px; margin:auto; max-width:420px; z-index:2000; font-size:.9rem;
   background:var(--espresso); color:var(--cream); border-radius:var(--radius); padding:12px 16px; box-shadow:0 16px 40px rgba(46,26,15,.3); }
 #toast:empty { display:none; }
-@media (max-width:520px) { #nav { padding-top:.75rem; } h1 { font-size:1.4rem; } .die { width:56px; height:56px; } .sec { margin-top:2.5rem; } }
+@media (max-width:520px) { #nav { padding-top:.75rem; } h1 { font-size:1.4rem; } .die { width:60px; height:60px; } .die b { font-size:1.9rem; } .sec { margin-top:2.5rem; } }
+
+/* ---- Head to head: tabel perbandingan ---- */
+.card.flush { padding:0; overflow:hidden; }
+.cmp-scroll { overflow-x:auto; }
+table.cmp { width:100%; table-layout:fixed; border-collapse:collapse; font-size:.9rem; }
+.cmp col.first, .cmp th:first-child { width:44%; }
+.cmp th { padding:14px 16px; text-transform:none; letter-spacing:0; font-size:.85rem; font-weight:600; color:var(--muted);
+  border-bottom:1px solid var(--line-2); text-align:left; white-space:nowrap; }
+.cmp th.num { text-align:right; color:var(--espresso); }
+.cmp-player { display:inline-flex; align-items:center; gap:8px; max-width:100%; }
+.cmp-player span:last-child { overflow:hidden; text-overflow:ellipsis; }
+.cmp-player .avatar { width:28px; height:28px; font-size:15px; }
+.cmp td { padding:13px 16px; border-bottom:1px solid var(--line); color:var(--espresso); }
+.cmp tbody tr:last-child td { border-bottom:0; }
+.cmp tbody tr:nth-child(odd) { background:var(--paper); }
+.cmp tbody tr:nth-child(even) { background:#FAF0E3; }
+.cmp tbody tr:hover { background:var(--soft); }
+.cmp tbody tr:hover td { background:transparent; }
+.cmp td.num { text-align:right; font-variant-numeric:tabular-nums; }
+.cmp td.shared { color:var(--muted); }
+.cmp-label { display:inline-flex; align-items:center; gap:8px; }
+.cmp-glyph { font-weight:700; }
+.cmp .best { display:inline-block; font-weight:700; background:var(--soft); border:1px solid var(--line-2); border-radius:8px; padding:1px 10px; }
+@media (max-width:520px) { .cmp th, .cmp td { padding:12px 10px; font-size:.84rem; } .cmp th:first-child { width:40%; } }
+
+/* ---- Game history: satu baris per match, belang ---- */
+.hlist { padding:0; }
+.hrow { display:flex; align-items:center; gap:12px; padding:10px 16px; min-height:68px; border-bottom:1px solid var(--line); }
+.hrow:last-child { border-bottom:0; }
+.hrow:nth-child(odd) { background:var(--paper); }
+.hrow:nth-child(even) { background:#FAF0E3; }
+.hrow:hover { background:var(--soft); }
+.hmain { flex:1; min-width:0; display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none; align-self:stretch; }
+.hmain .avatar { width:42px; height:42px; border-radius:10px; }
+.htext { display:flex; flex-direction:column; min-width:0; line-height:1.3; }
+.htext b { font-weight:600; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.htext small { font-size:.75rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.colordot { width:28px; height:28px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:16px; line-height:1;
+  border:1px solid var(--line-2); background:var(--paper); color:var(--espresso); }
+.colordot.b { background:var(--espresso); border-color:var(--espresso); color:var(--cream); }
+.mark { width:22px; height:22px; flex:none; border-radius:6px; display:grid; place-items:center; font-weight:700; font-size:.95rem; line-height:1; color:#fff; }
+.mark.win { background:var(--ok); } .mark.loss { background:var(--danger); }
+.mark.draw { background:var(--caramel); } .mark.none { background:var(--line-2); color:var(--muted); }
+.button.replay { width:48px; min-height:48px; padding:0; border-radius:var(--radius); }
+.button.replay .ico { width:20px; height:20px; }
+@media (max-width:520px) { .hmoves { display:none; } .hrow { gap:8px; padding:8px 10px; } .hmain { gap:8px; } .colordot { width:24px; height:24px; font-size:13px; }
+  .hmain .avatar { width:38px; height:38px; } .button.replay { width:44px; min-height:44px; } }
 @media (prefers-reduced-motion:reduce) { .die.rolling, .spinner { animation:none; } html { scroll-behavior:auto; } }
 </style>
 </head>
@@ -197,7 +247,7 @@ const esc = v => String(v ?? '').replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};
 const NAMES = { p: 'Pion', n: 'Kuda', b: 'Gajah', r: 'Benteng', q: 'Menteri', k: 'Raja' };
 const GLYPH = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
 const DIE = ['', 'p', 'n', 'b', 'r', 'q', 'k'];
-const PRESETS = ['♔', '♕', '♖', '♗', '♘', '♙', '★', '♥'];
+const PRESETS = ['♔', '♕', '♖', '♗', '♘', '♙'];
 const REASONS = { king_captured: 'Raja dimakan', resignation: 'Menyerah', agreement: 'Sepakat remis',
   turn_limit: '100 giliran tanpa kemajuan', bare_kings: 'Tinggal dua raja',
   mutual_abandon: 'Dihentikan bersama', cancelled: 'Dibatalkan' };
@@ -211,10 +261,10 @@ let channels = [], pollTimer = null, syncTimer = null, connState = 'connecting';
 const historyQuery = { filter: 'all', sort: 'newest', page: 1 };
 
 const prefs = (() => {
-  const base = { sound: true, animation: true, orientation: 'white' };
-  try { return { ...base, ...JSON.parse(localStorage.getItem('dc-prefs')) }; } catch { return base; }
+  const base = { sound: true, animation: true, orientation: 'mine' };
+  try { return { ...base, ...JSON.parse(localStorage.getItem('dc-prefs-v3')) }; } catch { return base; }
 })();
-const savePrefs = () => { try { localStorage.setItem('dc-prefs', JSON.stringify(prefs)); } catch { /* storage blocked */ } };
+const savePrefs = () => { try { localStorage.setItem('dc-prefs-v3', JSON.stringify(prefs)); } catch { /* storage blocked */ } };
 
 // ---- helpers ----
 let toastTimer;
@@ -253,9 +303,10 @@ async function fetchPlayers() {
 
 const player = id => boot.players.find(p => p.id === id);
 const name = id => esc(player(id)?.display_name);
+const cleanAvatar = a => ['★', '♥'].includes(a) ? PRESETS[0] : a;
 const avatar = a => (a || '').startsWith('data:') ? `<img class="avatar" src="${esc(a)}" alt="">`
-  : `<span class="avatar" aria-hidden="true">${esc(a)}</span>`;
-const who = (id, extra = '') => `<div class="row">${avatar(player(id)?.avatar)}<div><strong>${name(id)}</strong>
+  : `<span class="avatar" aria-hidden="true">${esc(cleanAvatar(a))}</span>`;
+const who = (id, extra = '') => `<div class="row" ${id === boot.me ? 'data-me role="button" tabindex="0" aria-label="Edit profil"' : ''}>${avatar(player(id)?.avatar)}<div><strong>${name(id)}</strong>
   <div class="muted">${extra}</div></div></div>`;
 const date = s => s ? new Date(s).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
 const duration = s => { s = Math.round(s || 0); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
@@ -302,9 +353,11 @@ function boardHtml(fen, { flip = false, last = [], sel = null, targets = [], mov
       ${i >= 56 ? `<span class="coord file">${'abcdefgh'[f]}</span>` : ''}</button>`;
   }).join('')}</div>`;
 }
+const glyph = k => GLYPH[k] + '\uFE0E';           // \uFE0E = tampil sebagai teks, bukan emoji
+const diceGlyphs = values => values.map(v => glyph(DIE[v])).join(' ');
 const diceHtml = (values, used = [], rolling = false) => `<div class="row">${values.map((v, i) =>
-  `<div class="die ${used.includes(i) ? 'used' : ''} ${rolling ? 'rolling' : ''}">
-   <b>${v} ${GLYPH[DIE[v]]}︎</b><small>${used.includes(i) ? 'terpakai' : NAMES[DIE[v]]}</small></div>`).join('')}</div>`;
+  `<div class="die ${used.includes(i) ? 'used' : ''} ${rolling ? 'rolling' : ''}" role="img"
+    aria-label="${NAMES[DIE[v]]}${used.includes(i) ? ', terpakai' : ''}"><b aria-hidden="true">${glyph(DIE[v])}</b></div>`).join('')}</div>`;
 const flipFor = whiteId => prefs.orientation === 'mine' && boot.me !== whiteId;
 
 // ---- auth + profile screens ----
@@ -385,30 +438,58 @@ async function signOut() {
   loginScreen();
 }
 
-const statList = s => `<dl class="stats">${[['Total match', s.total], ['Menang', s.wins], ['Kalah', s.losses],
-  ['Remis', s.draws], ['Win rate', percent(s.winRate)], ['Total waktu bermain', duration(s.totalPlayingTime)],
-  ['Rata-rata durasi', duration(s.averageDuration)], ['Rata-rata langkah', Number(s.averageMoves).toFixed(1)],
-  ['Streak menang terpanjang', s.longestStreak], ['Streak menang saat ini', s.currentStreak],
-  ['Terakhir bermain', date(s.lastPlayed)]].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
 
-const matchCard = g => `<a class="card" href="#match/${g.id}" style="color:inherit;text-decoration:none">
-  <div class="row between"><strong>${esc(g.game_code)}</strong><strong>${result(g)}</strong></div>
-  <div>Putih: ${name(g.player_white)} · Hitam: ${name(g.player_black)}</div>
-  <div class="muted">${date(g.finished_at)} · ${duration(g.duration_seconds)} · ${g.total_moves ?? 0} langkah</div></a>`;
-
-
+// ---- Head to head: tabel perbandingan (gaya "Table Comparison" Tancredi Clan) ----
 function headToHead(s) {
-  const [a, b] = boot.players, h = s.headToHead, f = s.frequency;
-  return `<div class="card"><div class="row between">${who(a.id)}
-    <p class="versus">${s.players[a.id].wins} – ${s.players[b.id].wins}</p>${who(b.id)}</div>
-    <dl class="stats"><dt>Total pertandingan selesai</dt><dd>${h.total}</dd><dt>Remis</dt><dd>${h.draws}</dd>
-    <dt>Abandoned (tidak dihitung)</dt><dd>${h.abandoned}</dd>
-    <dt>Win rate ${name(a.id)}</dt><dd>${percent(s.players[a.id].winRate)}</dd>
-    <dt>Win rate ${name(b.id)}</dt><dd>${percent(s.players[b.id].winRate)}</dd>
-    <dt>Pemenang terakhir</dt><dd>${h.mostRecentWinner ? name(h.mostRecentWinner) : '—'}</dd>
-    <dt>Streak berjalan</dt><dd>${boot.players.filter(p => s.players[p.id].currentStreak)
-      .map(p => `${name(p.id)} ${s.players[p.id].currentStreak}×`).join('') || '—'}</dd>
-    <dt>Match 7 hari terakhir</dt><dd>${f.last7days}</dd><dt>Match 30 hari terakhir</dt><dd>${f.last30days}</dd></dl></div>`;
+  const [a, b] = boot.players, A = s.players[a.id], B = s.players[b.id], h = s.headToHead, f = s.frequency;
+  const num = v => Number(v).toLocaleString('id-ID');
+  // [glyph, label, nilai A, nilai B, 'max' | 'min', format]
+  const rows = [
+    ['◆', 'Menang', A.wins, B.wins, 'max', num],
+    ['▽', 'Kalah', A.losses, B.losses, 'min', num],
+    ['%', 'Win rate', A.winRate, B.winRate, 'max', percent],
+    ['↑', 'Streak menang terpanjang', A.longestStreak, B.longestStreak, 'max', num],
+    ['↻', 'Streak menang saat ini', A.currentStreak, B.currentStreak, 'max', num],
+  ];
+  const glyphColors = ['#8B5E3C', '#B8860B', '#2E1A0F', '#6B4423'];
+  const cell = (v, other, kind, fmt) => {
+    const best = kind === 'max' ? v > other : v < other;
+    return `<td class="num">${best ? `<span class="best">${fmt(v)}</span>` : fmt(v)}</td>`;
+  };
+  const shared = [
+    ['Total match selesai', h.total], ['Remis', h.draws], ['Abandoned (tidak dihitung)', h.abandoned],
+    ['Pemenang terakhir', h.mostRecentWinner ? name(h.mostRecentWinner) : '—'],
+    ['Match 7 hari terakhir', f.last7days], ['Match 30 hari terakhir', f.last30days],
+    ['Rata-rata durasi', duration(A.averageDuration)], ['Rata-rata langkah', Number(A.averageMoves).toFixed(1)],
+    ['Total waktu bermain', duration(A.totalPlayingTime)], ['Terakhir bermain', date(A.lastPlayed)],
+  ];
+  const head = p => `<th class="num"><span class="cmp-player">${avatar(p.avatar)}<span>${esc(p.display_name)}</span></span></th>`;
+  return `<div class="card flush"><div class="cmp-scroll"><table class="cmp">
+    <thead><tr><th>Attribute</th>${head(a)}${head(b)}</tr></thead><tbody>
+    ${rows.map(([g, label, va, vb, kind, fmt], i) => `<tr><td><span class="cmp-label">${label}
+      <span class="cmp-glyph" style="color:${glyphColors[i % glyphColors.length]}" aria-hidden="true">${g}</span></span></td>
+      ${cell(va, vb, kind, fmt)}${cell(vb, va, kind, fmt)}</tr>`).join('')}
+    ${shared.map(([label, v]) => `<tr><td>${label}</td><td class="num shared" colspan="2">${v}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+}
+
+// ---- Game history: satu baris elegan per pertandingan, baris belang seperti leaderboard ----
+const shortDate = s => s ? new Date(s).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+function historyRow(g) {
+  const mine = g.player_white === boot.me ? 'w' : 'b';
+  const opp = mine === 'w' ? g.player_black : g.player_white;
+  const outcome = g.status === 'abandoned' ? ['none', '–', 'Abandoned'] : !g.winner ? ['draw', '=', 'Remis']
+    : g.winner === boot.me ? ['win', '+', 'Menang'] : ['loss', '−', 'Kalah'];
+  return `<div class="hrow">
+    <a class="hmain" href="#match/${g.id}" aria-label="Detail ${esc(g.game_code)}: lawan ${name(opp)}, ${outcome[2]}">
+      <span class="colordot ${mine}" title="Kamu main ${mine === 'w' ? 'putih' : 'hitam'}" aria-hidden="true">${mine === 'w' ? '♔' : '♚'}</span>
+      ${avatar(player(opp)?.avatar)}
+      <span class="htext"><b>${name(opp)}</b>
+        <small>${shortDate(g.finished_at)} · ${duration(g.duration_seconds)} <span class="hmoves"> · ${g.total_moves ?? 0} langkah</span></small></span>
+    </a>
+    <span class="mark ${outcome[0]}" title="${outcome[2]}" role="img" aria-label="${outcome[2]}">${outcome[1]}</span>
+    <a class="button replay" href="#replay/${g.id}" aria-label="Replay ${esc(g.game_code)}" title="Replay">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></a></div>`;
 }
 const isHome = () => !/^(match|replay)\//.test(location.hash.slice(1));
 let homeStats = null;
@@ -417,13 +498,17 @@ let homeStats = null;
 function paintSetup() {
   const box = $('#setupBody');
   if (!box) return;
+  const playing = live?.game.status === 'active';
+  for (const id of ['#secH2H', '#secHistory']) { const el = $(id); if (el) el.hidden = playing; }
     if (!live) {
+      const chosen = $('#color')?.value;
       box.innerHTML = `<div class="card stack"><div class="grid">${boot.players.map(p =>
         `<div>${who(p.id, p.id === boot.me ? 'Kamu' : online.includes(p.id) ? 'Online' : 'Offline')}</div>`).join('')}</div>
         <label>Warnamu<select id="color"><option value="w">Putih (jalan dulu)</option><option value="b">Hitam</option>
         <option value="random">Acak</option></select></label>
         <button id="create">Buat pertandingan</button>
         <p class="muted">Lawanmu harus menerima dari perangkatnya sebelum pertandingan dimulai.</p></div>`;
+      if (chosen) $('#color').value = chosen;
       $('#create').onclick = () => run(() => rpc('create_match', { p_color: $('#color').value }));
       return;
     }
@@ -457,29 +542,21 @@ function paintSetup() {
           <p class="muted">${esc(g.game_code)} · giliran ${live.turn.turn_number} · berlangsung</p>
           ${shown ? `${roll ? '' : `<p class="muted">Lemparan terakhir (${name(shown.player_id)}):</p>`}${diceHtml(shown.dice_values, shownUsed, animate)}
             ${!roll && !shownUsed.length ? '<p>Tidak ada langkah legal, giliran dilewati.</p>' : ''}` : '<p>Belum ada lemparan.</p>'}
-          <div class="row" style="margin-top:12px"><button data-act="roll" ${myTurn && !roll ? '' : 'disabled'}>Kocok dadu</button></div>
-          ${roll ? `<p class="muted">${myTurn ? (selected ? `Terpilih: ${selected}. Pilih petak tujuan.` : 'Pilih bidak, lalu petak tujuan.') : 'Menunggu lawan bergerak.'}</p>` : ''}</div>
+          <div class="row" style="margin-top:12px"><button data-act="roll" ${myTurn && !roll ? '' : 'disabled'}>Kocok dadu</button>
+            <button class="ghost" data-act="endturn" ${myTurn && roll && live.used.length ? '' : 'disabled'}>Akhiri giliran</button></div>
+          ${roll ? `<p class="muted">${myTurn ? (selected ? `Terpilih: ${selected}. Pilih petak tujuan.`
+            : live.legal.length ? (live.used.length ? 'Lanjut gerak, atau akhiri giliran kapan saja.' : 'Pilih bidak, lalu petak tujuan.')
+            : 'Tidak ada gerakan lagi. Giliran selesai otomatis.') : 'Menunggu lawan bergerak.'}</p>` : ''}</div>
         ${offer ? `<div class="card"><p>${name(offer[1])} mengajukan ${offer[2]}.</p>${offer[1] === boot.me ? '' :
           `<div class="row"><button data-act="${offer[0]}">Setuju</button><button class="ghost" data-act="decline">Tolak</button></div>`}</div>` : ''}
         <div class="card"><h3>Langkah</h3><p>${live.moves.slice(-9).map(m => `${m.move_number}. ${esc(m.move_san)}`).join(' · ') || 'Belum ada.'}</p>
           <h3>Riwayat dadu</h3><p class="muted">${live.rolls.slice(-5).reverse().map(r =>
-            `${name(r.player_id)}: ${r.dice_values.map(v => NAMES[DIE[v]]).join(', ')}`).join('<br>') || 'Belum ada.'}</p>
+            `${name(r.player_id)}: <span class="dice-line">${diceGlyphs(r.dice_values)}</span>`).join('<br>') || 'Belum ada.'}</p>
           <div class="row"><button class="ghost" data-act="draw">Ajukan remis</button>
           <button class="ghost" data-act="abandon">Ajukan berhenti</button>
           <button class="ghost" data-act="resign">Menyerah</button></div></div></div></div>`;
     }
     box.querySelectorAll('[data-act]').forEach(b => b.onclick = () => gameAction(b.dataset.act));
-}
-function paintPlayers(stats) {
-  const box = $('#playersBody');
-  if (!box) return;
-  box.innerHTML = `<div class="grid">${boot.players.map(p => `<div class="card">
-    ${who(p.id, `@${esc(p.username)}${p.id === boot.me ? ' · kamu' : ''} · bergabung ${date(p.created_at)}`)}
-    ${statList(stats.players[p.id])}
-    <div class="row" style="margin-top:12px"><button class="ghost" data-wins="${p.slot}">Lihat kemenangan</button></div></div>`).join('')}</div>`;
-  box.querySelectorAll('[data-wins]').forEach(b => b.onclick = () => {
-    Object.assign(historyQuery, { filter: 'p' + b.dataset.wins, page: 1 }); reloadHistory(true);
-  });
 }
 function paintHistory(data) {
   const box = $('#historyBody');
@@ -492,7 +569,7 @@ function paintHistory(data) {
       ['p2', name(b.id) + ' menang'], ['draw', 'Remis'], ['abandoned', 'Abandoned']], historyQuery.filter)}</select></label>
     <label>Urutkan<select id="sort">${options([['newest', 'Terbaru'], ['oldest', 'Terlama dulu'],
       ['longest', 'Durasi terpanjang'], ['shortest', 'Durasi terpendek']], historyQuery.sort)}</select></label></div>
-    ${data.games.length ? `<div class="grid">${data.games.map(matchCard).join('')}</div>`
+    ${data.games.length ? `<div class="card flush hlist">${data.games.map(historyRow).join('')}</div>`
       : '<div class="card center">Belum ada pertandingan. Mulai satu dari Match setup.</div>'}
     <div class="row between"><button class="ghost" id="prev" ${data.page <= 1 ? 'disabled' : ''}>Sebelumnya</button>
     <span class="muted">Halaman ${data.page} / ${data.pages}</span>
@@ -524,9 +601,8 @@ const pages = {
       view.innerHTML = `
         <section class="sec" id="secSetup"><div class="sec-head"><span class="sec-no">01</span><h2>Match setup</h2></div><div id="setupBody"></div></section>
         <section class="sec" id="secH2H"><div class="sec-head"><span class="sec-no">02</span><h2>Head to head</h2></div><div id="h2hBody"></div></section>
-        <section class="sec" id="secPlayers"><div class="sec-head"><span class="sec-no">03</span><h2>Players</h2></div><div id="playersBody"></div></section>
-        <section class="sec" id="secHistory"><div class="sec-head"><span class="sec-no">04</span><h2>Game history</h2></div><div id="historyBody"></div></section>`;
-      paintSetup(); $('#h2hBody').innerHTML = headToHead(stats); paintPlayers(stats); paintHistory(hist);
+        <section class="sec" id="secHistory"><div class="sec-head"><span class="sec-no">03</span><h2>Game history</h2></div><div id="historyBody"></div></section>`;
+      paintSetup(); $('#h2hBody').innerHTML = headToHead(stats); paintHistory(hist);
     };
   },
   async match(id) {
@@ -551,7 +627,7 @@ const pages = {
         <tr><th>Giliran</th><th>Pemain</th><th>Dadu</th><th>Langkah</th><th>Dimakan</th></tr>
         ${d.rolls.map(r => { const ms = d.moves.filter(m => m.turn_id === r.turn_id);
           return `<tr><td>${turn(r.turn_id).turn_number}</td><td>${name(r.player_id)}</td>
-          <td>${r.dice_values.map(v => NAMES[DIE[v]]).join(', ')}</td>
+          <td><span class="dice-line">${diceGlyphs(r.dice_values)}</span></td>
           <td>${ms.map(m => esc(m.move_san)).join(', ') || 'tidak ada'}</td>
           <td>${ms.filter(m => m.captured_piece).map(m => NAMES[m.captured_piece]).join(', ') || '—'}</td></tr>`; }).join('')
           || '<tr><td colspan="5">Belum ada lemparan dadu.</td></tr>'}</table></div></div></div>`;
@@ -586,7 +662,7 @@ const pages = {
         $('#rboard').innerHTML = boardHtml(f.fen, { flip: flipFor(g.player_white), last: m ? [m.from_square, m.to_square] : [] });
         $('#rinfo').innerHTML = `<p>Bingkai ${at} / ${frames.length - 1} · Langkah ${frames.slice(0, at + 1).filter(y => y.move).length} / ${d.moves.length}</p>
           ${f.roll ? `<p>Giliran ${f.turn.turn_number}: <strong>${name(f.turn.player_id)}</strong></p>${diceHtml(f.roll.dice_values, f.used)}
-          <p>${m ? `${NAMES[m.piece_type]} ${esc(m.move_san)}${m.captured_piece ? ` · memakan ${NAMES[m.captured_piece]}` : ''}` : 'Tidak ada langkah legal pada lemparan ini.'}</p>`
+          <p>${m ? `${glyph(m.piece_type)} ${esc(m.move_san)}${m.captured_piece ? ` · memakan ${glyph(m.captured_piece)}` : ''}` : 'Tidak ada langkah legal pada lemparan ini.'}</p>`
           : '<p>Posisi awal.</p>'}`;
       };
       const stop = () => clearInterval(replayTimer);
@@ -608,6 +684,7 @@ const ACTIONS = {
   roll: id => ['roll_dice', { p_game_id: id }], resign: id => ['resign_match', { p_game_id: id }],
   draw: id => ['offer_end', { p_game_id: id, p_kind: 'draw' }], abandon: id => ['offer_end', { p_game_id: id, p_kind: 'abandon' }],
   decline: id => ['decline_offer', { p_game_id: id }],
+  endturn: id => ['end_turn', { p_game_id: id }],
 };
 async function gameAction(act) {
   if (!live || !ACTIONS[act]) return;
@@ -615,6 +692,7 @@ async function gameAction(act) {
   if (act === 'resign' && !await confirmBox('Menyerah?', 'Lawanmu akan dicatat sebagai pemenang.')) return;
   if (act === 'abandon' && !await confirmBox('Ajukan berhenti?', 'Pertandingan dihentikan tanpa hasil bila lawan setuju.')) return;
   if (act === 'cancel' && g.created_by !== boot.me && !await confirmBox('Tolak ajakan?', 'Pertandingan akan dibatalkan.')) return;
+  if (act === 'endturn' && live.legal.length && !await confirmBox('Akhiri giliran?', 'Masih ada gerakan legal. Dadu yang tersisa akan hangus.')) return;
   if (act === 'roll') beep();
   const [fn, args] = ACTIONS[act](g.id);
   run(() => rpc(fn, { ...args, p_expected_version: g.version }));
@@ -635,6 +713,16 @@ function clickSquare(sq) {
   modal.onclose = () => modal.returnValue && send(modal.returnValue);
   modal.showModal();
 }
+
+// Ketuk (atau Enter) pada profil sendiri membuka card edit profil.
+function openOwnProfile(event) {
+  if (!event.target.closest('[data-me]')) return;
+  event.stopPropagation();
+  window.scrollTo({ top: 0 });
+  if ($('#profileCard').hidden) $('#profileBtn').click();
+}
+view.addEventListener('click', openOwnProfile);
+view.addEventListener('keydown', e => { if (e.key === 'Enter') openOwnProfile(e); });
 
 // Satu listener untuk seluruh papan. Tetap bekerja meskipun isi view dirender ulang.
 view.addEventListener('click', event => {
@@ -685,26 +773,10 @@ function closeProfile() {
   if (c) c.hidden = true;
   if (b) b.setAttribute('aria-expanded', 'false');
 }
-function editProfileDialog() {
-  const me = player(boot.me);
-  modal.innerHTML = `<form class="stack" id="pfForm" style="gap:1rem"><h2 style="margin:0">Edit profil</h2>
-    <p class="muted">@${esc(me.username)} · Player ${me.slot}</p>
-    <label>Nama tampilan<input name="displayName" maxlength="24" value="${esc(me.display_name)}" required></label>
-    ${avatarPicker('avatar', me.avatar)}
-    <div class="row"><button>Simpan</button><button type="button" class="ghost" id="pfCancel">Batal</button></div></form>`;
-  modal.onclose = null; modal.returnValue = '';
-  wirePickers(modal);
-  $('#pfCancel').onclick = () => modal.close();
-  onSubmit($('#pfForm'), async d => {
-    await rpc('update_profile', { p_display_name: d.displayName, p_avatar: d.avatar });
-    await fetchPlayers(); updateHeader(); modal.close(); toast('Profil disimpan.'); render();
-  });
-  modal.showModal();
-}
 function rulesDialog() {
-  modal.innerHTML = `<h2>Aturan (dice3-kingcapture-v1)</h2><ul><li>3 dadu per giliran. 1 Pion, 2 Kuda, 3 Gajah, 4 Benteng, 5 Menteri, 6 Raja.</li>
+  modal.innerHTML = `<h2>Aturan (dice3-kingcapture-v1)</h2><ul><li>3 dadu per giliran. Gambar pada dadu (♟︎ ♞︎ ♝︎ ♜︎ ♛︎ ♚︎) menentukan bidak yang boleh digerakkan.</li>
         <li>Satu dadu untuk satu langkah, urutan bebas.</li>
-        <li>Wajib memakai dadu sebanyak mungkin. Dadu yang tidak bisa dipakai hangus.</li>
+        <li>Pakai dadu sebanyak yang kamu mau (minimal satu gerakan). Tidak ada kewajiban memaksimalkan; akhiri giliran kapan saja dengan tombol Akhiri giliran, dadu sisa hangus.</li>
         <li>Tidak ada skak. Menang dengan memakan raja.</li>
         <li>Rokade memakai dadu Raja dan Benteng.</li>
         <li>En passant berlaku pada giliran lawan berikutnya.</li>
@@ -714,28 +786,30 @@ function rulesDialog() {
   modal.showModal();
 }
 function renderProfileCard() {
-  const me = player(boot.me), st = homeStats?.players?.[boot.me];
+  const me = player(boot.me);
   const card = $('#profileCard');
-  card.innerHTML = `<div class="row">${avatar(me.avatar).replace('class="avatar"', 'class="avatar lg"')}
-    <div style="min-width:0"><strong>${esc(me.display_name)}</strong><div class="muted">@${esc(me.username)} · Player ${me.slot}</div></div></div>
-    ${st ? `<div class="mini-stats"><div><b>${st.total}</b><span>Match</span></div><div><b>${st.wins}</b><span>Menang</span></div>
-      <div><b>${percent(st.winRate)}</b><span>Win rate</span></div></div>` : ''}
-    <div class="menu-divider"></div>
-    <div><button class="menu-item" id="pfEdit" type="button">Edit profil</button>
-    <button class="menu-item" id="pfRules" type="button">Aturan permainan</button></div>
+  card.innerHTML = `<form class="stack" id="pfForm" style="gap:1rem"><h3 style="margin:0">Edit profil</h3>
+    <p class="muted">@${esc(me.username)} · Player ${me.slot}</p>
+    <label>Nama tampilan<input name="displayName" maxlength="24" value="${esc(me.display_name)}" required></label>
+    ${avatarPicker('avatar', cleanAvatar(me.avatar))}
+    <button>Simpan profil</button></form>
     <div class="menu-divider"></div>
     <div class="pref"><span>Suara</span><input type="checkbox" id="pfSound" ${prefs.sound ? 'checked' : ''} aria-label="Suara"></div>
     <div class="pref"><span>Animasi dadu</span><input type="checkbox" id="pfAnim" ${prefs.animation ? 'checked' : ''} aria-label="Animasi dadu"></div>
-    <div class="pref"><span>Papan</span><select id="pfOri" aria-label="Orientasi papan"><option value="white">Putih di bawah</option>
-      <option value="mine" ${prefs.orientation === 'mine' ? 'selected' : ''}>Warnaku di bawah</option></select></div>
+    <div class="pref"><span>Papan</span><select id="pfOri" aria-label="Orientasi papan">
+      <option value="mine" ${prefs.orientation === 'mine' ? 'selected' : ''}>Warnaku di bawah</option>
+      <option value="white" ${prefs.orientation === 'white' ? 'selected' : ''}>Putih di bawah</option></select></div>
     <div class="menu-divider"></div>
-    <button class="menu-item danger-text" id="pfOut" type="button">Keluar</button>`;
-  $('#pfEdit').onclick = () => { closeProfile(); editProfileDialog(); };
+    <button class="menu-item" id="pfRules" type="button">Aturan permainan</button>`;
+  wirePickers(card);
+  onSubmit($('#pfForm'), async d => {
+    await rpc('update_profile', { p_display_name: d.displayName, p_avatar: d.avatar });
+    await fetchPlayers(); updateHeader(); closeProfile(); toast('Profil disimpan.'); render();
+  });
   $('#pfRules').onclick = () => { closeProfile(); rulesDialog(); };
   $('#pfSound').onchange = e => { prefs.sound = e.target.checked; savePrefs(); };
   $('#pfAnim').onchange = e => { prefs.animation = e.target.checked; savePrefs(); };
   $('#pfOri').onchange = e => { prefs.orientation = e.target.value; savePrefs(); paintSetup(); };
-  $('#pfOut').onclick = () => { closeProfile(); signOut(); };
 }
 function buildHeader() {
   const nav = $('#nav');
