@@ -526,7 +526,6 @@ const pages = {
             <div class="row"><button class="ghost" data-act="draw">Ajukan remis</button>
             <button class="ghost" data-act="abandon">Ajukan berhenti</button>
             <button class="ghost" data-act="resign">Menyerah</button></div></div></div></div>`;
-        view.querySelectorAll('.board button').forEach(b => b.onclick = () => clickSquare(b.dataset.sq));
       }
       view.querySelectorAll('[data-act]').forEach(b => b.onclick = () => gameAction(b.dataset.act));
     };
@@ -598,6 +597,14 @@ function clickSquare(sq) {
   modal.onclose = () => modal.returnValue && send(modal.returnValue);
   modal.showModal();
 }
+
+// Satu listener untuk seluruh papan. Tetap bekerja meskipun isi view dirender ulang.
+view.addEventListener('click', event => {
+  const square = event.target.closest('.board button[data-sq]');
+  if (!square || !view.contains(square)) return;
+  event.preventDefault();
+  clickSquare(square.dataset.sq);
+});
 // Serializes user actions: while one request is in flight, further clicks are ignored (no duplicate submits).
 async function run(fn) {
   if (busy) return;
