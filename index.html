@@ -298,6 +298,42 @@ body.playing #secSetup > .title-row { display:none; }
   .seat.bottom { padding:4px 8px; } .seat.bottom .who { min-height:130px; }
   .passnote { line-height:1.2; }
 }
+
+/* ==== Revisi 3: header lebih tinggi, wave lebih tinggi & gelap, tabel belang detail/replay ==== */
+#nav { padding:1.9rem 0 2.1rem; border-radius:0 0 26px 26px; }
+body.playing #nav { padding:.9rem 0 1.1rem; margin-bottom:.6rem; border-radius:0 0 20px 20px; }
+.wave-clip { z-index:-1; }
+.wave { height:100%; color:#9C7556; }
+.wave .w1 path { fill-opacity:.34; } .wave .w2 path { fill-opacity:.22; } .wave .w3 path { stroke-opacity:.85; }
+.seat .wave { height:88%; }
+.wavy.dark .wave { color:#C9A27F; }
+.wavy.dark .wave .w1 path { fill-opacity:.3; } .wavy.dark .wave .w2 path { fill-opacity:.2; } .wavy.dark .wave .w3 path { stroke-opacity:.75; }
+.button.wavy, .button.replay { position:relative; overflow:hidden; isolation:isolate; }
+.pface { -webkit-tap-highlight-color:transparent; }
+.arena { --board:min(100%, 560px, max(300px, calc(100dvh - 460px))); }
+table.zt { table-layout:auto; font-size:.9rem; }
+.zt th { padding:14px 16px; font-size:.85rem; border-bottom:1px solid var(--sand); text-align:left; }
+.zt td { padding:13px 16px; border-bottom:0; vertical-align:middle; }
+.zt tbody tr:nth-child(even) { background:var(--tint); }
+.zt tbody tr:hover { background:var(--bg); }
+.zt td.k { color:var(--warm); width:44%; }
+.zt td.v { text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
+.zt .row { justify-content:flex-end; flex-wrap:nowrap; gap:6px; }
+.zt .die { width:44px; height:44px; box-shadow:none; } .zt .die b { font-size:1.5rem; }
+.die b.piece-w { color:#fff; -webkit-text-stroke:1.5px var(--cocoa); }
+.die b.piece-b { color:#2B1D13; }
+.toolbar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; }
+.toolbar button { padding:0; min-width:0; }
+.toolbar .ico, .iconrow .ico { width:20px; height:20px; }
+.iconrow { display:flex; gap:8px; flex-wrap:wrap; }
+.button.icon { width:48px; padding:0; }
+
+/* ---- Edit profil: modal di tengah layar, latar diburamkan, tidak bisa ditutup kecuali Simpan/Batal ---- */
+.profile-card { position:fixed; top:0; left:0; width:100%; max-height:none; inset:0; z-index:1500; display:grid; place-items:center; padding:1rem;
+  background:rgba(73,51,35,.38); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border:0; border-radius:0; box-shadow:none; overflow-y:auto; overscroll-behavior:contain; }
+.pf-box { width:min(100%,400px); max-height:calc(100dvh - 2rem); overflow-y:auto; background:var(--surface); color:var(--cocoa);
+  border:1px solid var(--sand); border-radius:var(--r-lg); padding:1.4rem; box-shadow:0 20px 50px rgba(73,51,35,.22); }
+body.modal-open { overflow:hidden; }
 </style>
 </head>
 <body>
@@ -354,6 +390,17 @@ const ICONS = {
   percent: '<path d="M18 5 6 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
   equal: '<path d="M5 9h14M5 15h14"/>',
   flame: '<path d="M12 3c1 5 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 3-6 1 2 2 2 2 2 1-2 0-5 1-7z"/>',
+  play: '<path d="M8 5v14l11-7z" fill="currentColor"/>',
+  pause: '<path d="M8 5v14M16 5v14" stroke-width="3.5"/>',
+  first: '<path d="M6 5v14"/><path d="M19 5v14l-10-7z" fill="currentColor"/>',
+  end: '<path d="M18 5v14"/><path d="M5 5v14l10-7z" fill="currentColor"/>',
+  prev: '<path d="M15 5l-7 7 7 7"/>',
+  next: '<path d="M9 5l7 7-7 7"/>',
+  restart: '<path d="M4 4v6h6"/><path d="M5.5 15a8 8 0 1 0 1-7.5L4 10"/>',
+  list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
+  home: '<path d="M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6"/>',
+  swap: '<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
+  back: '<path d="M19 12H5M11 5l-7 7 7 7"/>',
 };
 const WAVE_SVG = '<svg class="wave" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true"><g class="w1"><path d="M0 36 Q150 -4 300 36 T600 36 T900 36 T1200 36 V120 H0Z" fill="currentColor"/></g><g class="w2"><path d="M0 44 Q150 6 300 44 T600 44 T900 44 T1200 44 V120 H0Z" fill="currentColor"/></g><g class="w3"><path d="M0 34 Q150 -6 300 34 T600 34 T900 34 T1200 34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></g></svg>';
 const waveHtml = () => `<div class="wave-clip" aria-hidden="true">${WAVE_SVG}</div>`;
@@ -477,10 +524,10 @@ function boardHtml(fen, { flip = false, last = [], sel = null, targets = [], mov
   }).join('')}</div>`;
 }
 const glyph = k => GLYPH[k] + '\uFE0E';           // \uFE0E = tampil sebagai teks, bukan emoji
-const diceGlyphs = values => values.map(v => glyph(DIE[v])).join(' ');
-const diceHtml = (values, used = [], rolling = false) => `<div class="row">${values.map((v, i) =>
+const diceGlyphs = (values, owner = 'w') => values.map(v => `<span class="piece-${owner}">${glyph(DIE[v])}</span>`).join(' ');
+const diceHtml = (values, used = [], rolling = false, owner = 'w') => `<div class="row">${values.map((v, i) =>
   `<div class="die ${used.includes(i) ? 'used' : ''} ${rolling ? 'rolling' : ''}" role="img"
-    aria-label="${NAMES[DIE[v]]}${used.includes(i) ? ', terpakai' : ''}"><b aria-hidden="true">${glyph(DIE[v])}</b></div>`).join('')}</div>`;
+    aria-label="${NAMES[DIE[v]]}${used.includes(i) ? ', terpakai' : ''}"><b class="piece-${owner}" aria-hidden="true">${glyph(DIE[v])}</b></div>`).join('')}</div>`;
 const flipFor = whiteId => prefs.orientation === 'mine' && boot.me !== whiteId;
 
 // ---- auth + profile screens ----
@@ -619,7 +666,7 @@ function historyRow(g) {
         <small>${shortDate(g.finished_at)} · ${duration(g.duration_seconds)} <span class="hmoves"> · ${g.total_moves ?? 0} langkah</span></small></span>
     </a>
     <span class="mark ${outcome[0]}" title="${outcome[2]}" role="img" aria-label="${outcome[2]}">${outcome[1]}</span>
-    <a class="button replay" href="#replay/${g.id}" aria-label="Replay ${esc(g.game_code)}" title="Replay">
+    <a class="button replay wavy dark" href="#replay/${g.id}" aria-label="Replay ${esc(g.game_code)}" title="Replay">${waveHtml()}
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></a></div>`;
 }
 const isHome = () => !/^(match|replay)\//.test(location.hash.slice(1));
@@ -704,8 +751,8 @@ function paintSetup() {
           <div class="who">
             ${needRoll ? `<button type="button" class="rollbtn" data-act="roll" aria-label="Lempar tiga dadu">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9a8 8 0 0 1 13-3l2 2M20 4v4h-4M19 15a8 8 0 0 1-13 3l-2-2M4 20v-4h4"/></svg><span>ROLL</span></button>`
-              : `<span data-me role="button" tabindex="0" aria-label="Edit profil">${face(boot.me, myTurn)}</span>`}
-            <span class="pname" data-me>${name(boot.me)}</span><small>${color(boot.me)} · kamu</small></div>
+              : `<span>${face(boot.me, myTurn)}</span>`}
+            <span class="pname">${name(boot.me)}</span><small>${color(boot.me)} · kamu</small></div>
           <div class="side right"><button type="button" class="danger" data-act="resign">Menyerah</button></div></div>
         </div>
         <div class="stack">
@@ -783,26 +830,33 @@ const pages = {
     const d = await rpc('get_game_detail', { p_game_id: +id }), g = d.game;
     return () => {
       const turn = i => d.turns.find(t => t.id === i);
-      view.innerHTML = `<div class="stack"><div class="card"><h1>${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</h1>
-        <div class="grid">${g.winner
-          ? `<div>${who(g.winner, 'Pemenang')}</div><div>${who(g.winner === g.player_white ? g.player_black : g.player_white, 'Kalah')}</div>`
-          : [g.player_white, g.player_black].map(p => `<div>${who(p, g.status === 'abandoned' ? 'Abandoned' : g.status === 'completed' ? 'Remis' : 'Bermain')}</div>`).join('')}</div>
-        <dl class="stats"><dt>Putih</dt><dd>${name(g.player_white)}</dd><dt>Hitam</dt><dd>${name(g.player_black)}</dd>
-        <dt>Total langkah</dt><dd>${g.total_moves ?? d.moves.length}</dd><dt>Total lemparan dadu</dt><dd>${g.total_dice_rolls ?? d.rolls.length}</dd>
-        <dt>Durasi</dt><dd>${duration(g.duration_seconds)}</dd><dt>Mulai</dt><dd>${date(g.started_at)}</dd>
-        <dt>Selesai</dt><dd>${date(g.finished_at)}</dd></dl>
-        <div class="row" style="margin-top:12px"><a class="button" href="#replay/${g.id}">Replay match</a>
-        <button id="rematch" class="ghost" ${live ? 'disabled' : ''}>Rematch (tukar warna)</button>
-        <a class="button ghost" href="#home">← Kembali</a></div></div>
-        <div class="card"><h2>Posisi akhir</h2>${boardHtml(g.final_fen || g.current_fen, { flip: flipFor(g.player_white) })}</div>
-        <div class="card"><h2>Detail giliran</h2><div class="table"><table>
-        <tr><th>Giliran</th><th>Pemain</th><th>Dadu</th><th>Langkah</th><th>Dimakan</th></tr>
-        ${d.rolls.map(r => { const ms = d.moves.filter(m => m.turn_id === r.turn_id);
-          return `<tr><td>${turn(r.turn_id).turn_number}</td><td>${name(r.player_id)}</td>
-          <td><span class="dice-line">${diceGlyphs(r.dice_values)}</span></td>
-          <td>${ms.map(m => esc(m.move_san)).join(', ') || 'tidak ada'}</td>
-          <td>${ms.filter(m => m.captured_piece).map(m => NAMES[m.captured_piece]).join(', ') || '—'}</td></tr>`; }).join('')
-          || '<tr><td colspan="5">Belum ada lemparan dadu.</td></tr>'}</table></div></div></div>`;
+      const owner = p => p === g.player_white ? 'w' : 'b';
+      const kv = ([k, v]) => `<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`;
+      const summary = [['Putih', name(g.player_white)], ['Hitam', name(g.player_black)],
+        ['Total langkah', g.total_moves ?? d.moves.length], ['Total lemparan dadu', g.total_dice_rolls ?? d.rolls.length],
+        ['Durasi', duration(g.duration_seconds)], ['Mulai', date(g.started_at)], ['Selesai', date(g.finished_at)]];
+      const pair = g.winner
+        ? [[g.winner, 'Pemenang'], [g.winner === g.player_white ? g.player_black : g.player_white, 'Kalah']]
+        : [g.player_white, g.player_black].map(p => [p, g.status === 'abandoned' ? 'Abandoned' : g.status === 'completed' ? 'Remis' : 'Bermain']);
+      view.innerHTML = `<div class="stack">
+        <div class="card stack wavy">${waveHtml()}<h1 style="margin:0">${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</h1>
+          <div class="versus-row">${who(pair[0][0], pair[0][1])}<div class="vs" aria-hidden="true">VS</div>${who(pair[1][0], pair[1][1])}</div>
+          <div class="row"><a class="button wavy dark" href="#replay/${g.id}">${waveHtml()}${icon('play')}<span>Replay</span></a>
+            <button id="rematch" class="ghost" title="Main lagi dengan warna tertukar" ${live ? 'disabled' : ''}>${icon('swap')}<span>Rematch</span></button>
+            <a class="button ghost" href="#home">${icon('back')}<span>Kembali</span></a></div></div>
+        <section><div class="title-row"><h2>${icon('bars')}Ringkasan</h2></div>
+          <div class="panel"><div class="cmp-scroll"><table class="zt"><tbody>${summary.map(kv).join('')}</tbody></table></div></div></section>
+        <section><div class="title-row"><h2>${icon('crown')}Posisi akhir</h2></div>
+          <div class="card">${boardHtml(g.final_fen || g.current_fen, { flip: flipFor(g.player_white) })}</div></section>
+        <section><div class="title-row"><h2>${icon('clock')}Detail giliran</h2></div>
+          <div class="panel"><div class="cmp-scroll"><table class="zt">
+          <thead><tr><th>Giliran</th><th>Pemain</th><th>Dadu</th><th>Langkah</th><th>Dimakan</th></tr></thead><tbody>
+          ${d.rolls.map(r => { const ms = d.moves.filter(m => m.turn_id === r.turn_id);
+            return `<tr><td>${turn(r.turn_id).turn_number}</td><td>${name(r.player_id)}</td>
+            <td><span class="dice-line">${diceGlyphs(r.dice_values, owner(r.player_id))}</span></td>
+            <td>${ms.map(m => esc(m.move_san)).join(', ') || 'tidak ada'}</td>
+            <td>${ms.filter(m => m.captured_piece).map(m => NAMES[m.captured_piece]).join(', ') || '—'}</td></tr>`; }).join('')
+            || '<tr><td colspan="5">Belum ada lemparan dadu.</td></tr>'}</tbody></table></div></div></section></div>`;
       $('#rematch').onclick = () => run(async () => {
         await rpc('create_match', { p_color: g.player_white === boot.me ? 'b' : 'w', p_rematch_of: g.id });
         location.hash = 'home';
@@ -823,19 +877,25 @@ const pages = {
     }
     return () => {
       let at = 0;
-      view.innerHTML = `<h1>Replay ${esc(g.game_code)}</h1><div class="match"><div id="rboard"></div>
-        <div class="card stack"><div id="rinfo"></div><div class="row">
-        ${[['first', 'Awal'], ['back', 'Sebelumnya'], ['fwd', 'Berikutnya'], ['end', 'Akhir'],
-           ['play', 'Play'], ['pause', 'Pause'], ['restart', 'Ulang']].map(([k, l]) =>
-           `<button class="ghost" data-r="${k}">${l}</button>`).join('')}</div>
-        <a href="#match/${g.id}">Kembali ke detail</a> · <a href="#home">Halaman utama</a></div></div>`;
+      const btn = ([k, label, ic, cls]) => `<button type="button" class="${cls || 'ghost'}" data-r="${k}" aria-label="${label}" title="${label}">${icon(ic)}</button>`;
+      view.innerHTML = `<h1>Replay</h1><div class="match"><div id="rboard"></div>
+        <div class="stack"><div class="panel"><div class="cmp-scroll"><table class="zt"><tbody id="rinfo"></tbody></table></div></div>
+        <div class="card stack"><div class="toolbar" role="group" aria-label="Kontrol replay">
+        ${[['first', 'Awal', 'first'], ['back', 'Sebelumnya', 'prev'], ['play', 'Play', 'play', ''], ['pause', 'Pause', 'pause'],
+           ['fwd', 'Berikutnya', 'next'], ['end', 'Akhir', 'end'], ['restart', 'Ulang', 'restart']].map(btn).join('')}</div>
+        <div class="iconrow"><a class="button ghost icon" href="#match/${g.id}" aria-label="Kembali ke detail" title="Kembali ke detail">${icon('list')}</a>
+          <a class="button ghost icon" href="#home" aria-label="Halaman utama" title="Halaman utama">${icon('home')}</a></div></div></div></div>`;
       const draw = () => {
         const f = frames[at], m = f.move;
         $('#rboard').innerHTML = boardHtml(f.fen, { flip: flipFor(g.player_white), last: m ? [m.from_square, m.to_square] : [] });
-        $('#rinfo').innerHTML = `<p>Bingkai ${at} / ${frames.length - 1} · Langkah ${frames.slice(0, at + 1).filter(y => y.move).length} / ${d.moves.length}</p>
-          ${f.roll ? `<p>Giliran ${f.turn.turn_number}: <strong>${name(f.turn.player_id)}</strong></p>${diceHtml(f.roll.dice_values, f.used)}
-          <p>${m ? `${glyph(m.piece_type)} ${esc(m.move_san)}${m.captured_piece ? ` · memakan ${glyph(m.captured_piece)}` : ''}` : 'Tidak ada langkah legal pada lemparan ini.'}</p>`
-          : '<p>Posisi awal.</p>'}`;
+        const o = f.roll ? (f.roll.player_id === g.player_white ? 'w' : 'b') : 'w';
+        const rows = [['Bingkai', `${at} / ${frames.length - 1}`],
+          ['Langkah', `${frames.slice(0, at + 1).filter(y => y.move).length} / ${d.moves.length}`],
+          ...(f.roll ? [['Giliran', `${f.turn.turn_number} · ${name(f.turn.player_id)}`],
+            ['Dadu', diceHtml(f.roll.dice_values, f.used, false, o)],
+            ['Gerakan', m ? `<span class="piece-${o}">${glyph(m.piece_type)}</span> ${esc(m.move_san)}${m.captured_piece ? ` · memakan ${glyph(m.captured_piece)}` : ''}` : 'Tidak ada langkah legal']]
+            : [['Posisi', 'Posisi awal']])];
+        $('#rinfo').innerHTML = rows.map(([k, v]) => `<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('');
       };
       const stop = () => clearInterval(replayTimer);
       const actions = {
@@ -986,14 +1046,23 @@ function closeProfile() {
   const c = $('#profileCard'), b = $('#profileBtn');
   if (c) c.hidden = true;
   if (b) b.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('modal-open');
+}
+function openProfile() {
+  renderProfileCard();
+  $('#profileCard').hidden = false;
+  $('#profileBtn').setAttribute('aria-expanded', 'true');
+  document.body.classList.add('modal-open');
+  $('#profileCard input[name=displayName]')?.focus();
 }
 function renderProfileCard() {
   const me = player(boot.me);
   const card = $('#profileCard');
-  card.innerHTML = `<form class="stack" id="pfForm" style="gap:1rem"><h3 style="margin:0">Edit profil</h3>
+  card.innerHTML = `<form class="stack pf-box" id="pfForm" style="gap:1rem"><h3 style="margin:0">Edit profil</h3>
     <label>Nama tampilan<input name="displayName" maxlength="24" value="${esc(me.display_name)}" required></label>
     ${avatarPicker('avatar', cleanAvatar(me.avatar))}
-    <button>Simpan profil</button></form>`;
+    <div class="row"><button>Simpan profil</button><button type="button" class="ghost" id="pfCancel">Batal</button></div></form>`;
+  $('#pfCancel').onclick = closeProfile;
   wirePickers(card);
   onSubmit($('#pfForm'), async d => {
     await rpc('update_profile', { p_display_name: d.displayName, p_avatar: d.avatar });
@@ -1006,19 +1075,18 @@ function buildHeader() {
   nav.dataset.built = '1';
   nav.innerHTML = `${waveHtml()}<div class="shell"><div class="site-header">
     <div class="header-left"><button class="profile-btn" id="profileBtn" type="button" aria-haspopup="true" aria-expanded="false"
-      aria-controls="profileCard" aria-label="Buka kartu profil"></button><div class="profile-card" id="profileCard" hidden></div></div>
+      aria-controls="profileCard" aria-label="Buka kartu profil"></button></div>
     <div class="header-right"><span class="conn connecting" id="conn" role="status">Menyambung</span>
     <button class="install-btn" id="installBtn" type="button" aria-label="Unduh app">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span class="lbl">Unduh app</span></button></div></div></div>`;
-  $('#profileBtn').onclick = e => {
-    e.stopPropagation();
-    const open = $('#profileCard').hidden;
-    if (open) { renderProfileCard(); $('#profileCard').hidden = false; } else $('#profileCard').hidden = true;
-    $('#profileBtn').setAttribute('aria-expanded', String(open));
-  };
+  if (!$('#profileCard')) {
+    const o = document.createElement('div');
+    o.id = 'profileCard'; o.className = 'profile-card'; o.hidden = true;
+    o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', 'Edit profil');
+    document.body.appendChild(o);
+  }
+  $('#profileBtn').onclick = e => { e.stopPropagation(); openProfile(); };
   $('#installBtn').onclick = installApp;
-  document.addEventListener('click', e => { if (!e.target.closest('.header-left')) closeProfile(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProfile(); });
   updateInstallVisibility();
   paintConn();
 }
