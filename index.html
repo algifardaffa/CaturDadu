@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 /* Dice Chess — Soft Cocoa. Terang & lembut, putih bersih, dark cocoa sebagai identitas, caramel hanya aksen. Font: Inter. */
 :root {
@@ -334,6 +334,20 @@ table.zt { table-layout:auto; font-size:.9rem; }
 .pf-box { width:min(100%,400px); max-height:calc(100dvh - 2rem); overflow-y:auto; background:var(--surface); color:var(--cocoa);
   border:1px solid var(--sand); border-radius:var(--r-lg); padding:1.4rem; box-shadow:0 20px 50px rgba(73,51,35,.22); }
 body.modal-open { overflow:hidden; }
+
+/* ==== Tipografi: kecil, elegan, minimalis (skala seperti referensi: Inter, isi 12px) ==== */
+html { font-size:14px; }
+body { font:400 12px/1.5 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+h1 { font-size:20px; font-weight:700; letter-spacing:.04em; }
+h2 { font-weight:700; letter-spacing:0; } h3 { font-size:14px; font-weight:600; }
+.title-row h2 { font-size:16px; font-weight:700; }
+button, .button { font-size:12px; font-weight:600; min-height:40px; padding:8px 16px; }
+select, input { font-size:14px; min-height:44px; }
+.big { font-size:14px; min-height:48px; }
+.button.replay { min-height:44px; padding:0; }
+.actions3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.actions3 .button, .actions3 button { font-size:11px; min-height:40px; padding:8px 6px; gap:6px; white-space:nowrap; }
+.actions3 .ico { width:16px; height:16px; }
 </style>
 </head>
 <body>
@@ -666,7 +680,7 @@ function historyRow(g) {
         <small>${shortDate(g.finished_at)} · ${duration(g.duration_seconds)} <span class="hmoves"> · ${g.total_moves ?? 0} langkah</span></small></span>
     </a>
     <span class="mark ${outcome[0]}" title="${outcome[2]}" role="img" aria-label="${outcome[2]}">${outcome[1]}</span>
-    <a class="button replay wavy dark" href="#replay/${g.id}" aria-label="Replay ${esc(g.game_code)}" title="Replay">${waveHtml()}
+    <a class="button replay" href="#replay/${g.id}" aria-label="Replay ${esc(g.game_code)}" title="Replay">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></a></div>`;
 }
 const isHome = () => !/^(match|replay)\//.test(location.hash.slice(1));
@@ -707,7 +721,7 @@ function paintSetup() {
       box.innerHTML = `<div class="card stack wavy">${waveHtml()}<div class="versus-row">${who(g.player_white, 'Putih · ' + status(g.player_white))}
         <div class="vs" aria-hidden="true">VS</div>${who(g.player_black, 'Hitam · ' + status(g.player_black))}</div>
         <p class="note">${mine ? 'Menunggu lawan menerima…' : 'Kamu diajak bermain.'}</p>
-        ${mine ? '' : '<button class="big" data-act="accept">Terima dan mulai</button>'}
+        ${mine ? '' : '<button class="big" data-act="accept">Terima</button>'}
         <button class="ghost big" data-act="cancel">${mine ? 'Batalkan' : 'Tolak'}</button></div>`;
     } else {
       const myTurn = live.turn.player_id === boot.me, roll = live.roll;
@@ -783,7 +797,7 @@ function paintHistory(data) {
     <label>Urutkan<select id="sort">${options([['newest', 'Terbaru'], ['oldest', 'Terlama dulu'],
       ['longest', 'Durasi terpanjang'], ['shortest', 'Durasi terpendek']], historyQuery.sort)}</select></label></div>
     ${rows.length ? `<div class="hlist">${rows.map(historyRow).join('')}</div>`
-      : '<div class="card center">Belum ada pertandingan. Mulai satu dari Match setup.</div>'}
+      : '<div class="card center">Belum ada pertandingan. Mulai satu dari Play.</div>'}
     <div class="row between"><button class="ghost" id="prev" ${data.page <= 1 ? 'disabled' : ''}>Sebelumnya</button>
     <span class="muted">Halaman ${data.page} / ${data.pages}</span>
     <button class="ghost" id="next" ${data.page >= data.pages || rows.length < data.games.length ? 'disabled' : ''}>Berikutnya</button></div></div>`;
@@ -812,11 +826,11 @@ const pages = {
     data.catch(() => {});
     return () => {
       view.innerHTML = `
-        <section class="sec" id="secSetup"><div class="title-row"><h2>${icon('crown')}Match setup</h2>
+        <section class="sec" id="secSetup"><div class="title-row"><h2>${icon('crown')}Play</h2>
           <button type="button" class="link" id="quickStart" title="Buat pertandingan dengan warna acak">Quick Start →</button></div><div id="setupBody"></div></section>
-        <section class="sec" id="secH2H"><div class="title-row"><h2>${icon('bars')}Head to head</h2>
+        <section class="sec" id="secH2H"><div class="title-row"><h2>${icon('bars')}Versus</h2>
           <button type="button" class="link" id="h2hMore"></button></div><div id="h2hBody" class="panel"></div></section>
-        <section class="sec" id="secHistory"><div class="title-row"><h2>${icon('clock')}Game history</h2>
+        <section class="sec" id="secHistory"><div class="title-row"><h2>${icon('clock')}History</h2>
           <button type="button" class="link" id="historyMore" hidden></button></div><div id="historyBody" class="panel"></div></section>`;
       paintSetup();
       const anchor = $('#historyBody');
@@ -831,21 +845,15 @@ const pages = {
     return () => {
       const turn = i => d.turns.find(t => t.id === i);
       const owner = p => p === g.player_white ? 'w' : 'b';
-      const kv = ([k, v]) => `<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`;
-      const summary = [['Putih', name(g.player_white)], ['Hitam', name(g.player_black)],
-        ['Total langkah', g.total_moves ?? d.moves.length], ['Total lemparan dadu', g.total_dice_rolls ?? d.rolls.length],
-        ['Durasi', duration(g.duration_seconds)], ['Mulai', date(g.started_at)], ['Selesai', date(g.finished_at)]];
       const pair = g.winner
         ? [[g.winner, 'Pemenang'], [g.winner === g.player_white ? g.player_black : g.player_white, 'Kalah']]
         : [g.player_white, g.player_black].map(p => [p, g.status === 'abandoned' ? 'Abandoned' : g.status === 'completed' ? 'Remis' : 'Bermain']);
       view.innerHTML = `<div class="stack">
         <div class="card stack wavy">${waveHtml()}<h1 style="margin:0">${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</h1>
           <div class="versus-row">${who(pair[0][0], pair[0][1])}<div class="vs" aria-hidden="true">VS</div>${who(pair[1][0], pair[1][1])}</div>
-          <div class="row"><a class="button wavy dark" href="#replay/${g.id}">${waveHtml()}${icon('play')}<span>Replay</span></a>
+          <div class="actions3"><a class="button" href="#replay/${g.id}">${icon('play')}<span>Replay</span></a>
             <button id="rematch" class="ghost" title="Main lagi dengan warna tertukar" ${live ? 'disabled' : ''}>${icon('swap')}<span>Rematch</span></button>
-            <a class="button ghost" href="#home">${icon('back')}<span>Kembali</span></a></div></div>
-        <section><div class="title-row"><h2>${icon('bars')}Ringkasan</h2></div>
-          <div class="panel"><div class="cmp-scroll"><table class="zt"><tbody>${summary.map(kv).join('')}</tbody></table></div></div></section>
+            <a class="button ghost" href="#home">${icon('home')}<span>Home</span></a></div></div>
         <section><div class="title-row"><h2>${icon('crown')}Posisi akhir</h2></div>
           <div class="card">${boardHtml(g.final_fen || g.current_fen, { flip: flipFor(g.player_white) })}</div></section>
         <section><div class="title-row"><h2>${icon('clock')}Detail giliran</h2></div>
