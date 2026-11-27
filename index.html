@@ -998,6 +998,92 @@ body:not(.playing) #secSetup.playcard {
   background:#FFFFFF !important;
 }
 
+
+
+/* ===== Final requested control + move-list colors ===== */
+
+/* Start, Accept, Replay and Home: mocha brown */
+#create,
+#setupBody button[data-act="accept"],
+button[data-act="accept"],
+.button.replay,
+.match-summary a.button[href="#home"] {
+  background:linear-gradient(180deg,#725840 0%,#5F4935 100%) !important;
+  border:1px solid #543F2E !important;
+  color:#FFF9F4 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 4px 10px rgba(67,45,39,.16) !important;
+}
+#create:hover:not(:disabled),
+button[data-act="accept"]:hover:not(:disabled),
+.button.replay:hover:not(:disabled),
+.match-summary a.button[href="#home"]:hover {
+  background:linear-gradient(180deg,#624B36 0%,#503C2D 100%) !important;
+}
+
+/* Rematch: white secondary action */
+.match-summary button#rematch,
+.match-summary .actions2 button[data-act="rematch"] {
+  background:#FFFFFF !important;
+  border:1px solid #E8DED3 !important;
+  color:#432D27 !important;
+  box-shadow:0 2px 7px rgba(67,45,39,.07) !important;
+}
+.match-summary button#rematch:hover:not(:disabled),
+.match-summary .actions2 button[data-act="rematch"]:hover:not(:disabled) {
+  background:#FCF7F3 !important;
+  border-color:#CCBAAC !important;
+}
+
+/* Replay transport controls: muted mocha */
+.replay-wrap .toolbar button,
+.replay-wrap .toolbar button:hover:not(:disabled) {
+  background:#CCBAAC !important;
+  border:1px solid #B6A391 !important;
+  color:#432D27 !important;
+  box-shadow:0 2px 7px rgba(67,45,39,.08) !important;
+}
+.replay-wrap .toolbar button .ico { color:#432D27 !important; }
+
+/* Move list: alternating row AND move-chip backgrounds */
+.replay-wrap > .panel .mlist {
+  background:#FCF7F3 !important;
+}
+.replay-wrap > .panel .mrow,
+.replay-wrap > .panel .mrow:nth-child(odd) {
+  background:#FCF7F3 !important;
+}
+.replay-wrap > .panel .mrow:nth-child(even) {
+  background:#F6ECE2 !important;
+}
+.replay-wrap .mrow:nth-child(odd) .mvc,
+.replay-wrap .mrow:nth-child(odd) .mv,
+.replay-wrap .mrow:nth-child(odd) .mv.w,
+.replay-wrap .mrow:nth-child(odd) .mv.b {
+  background:#FCF7F3 !important;
+}
+.replay-wrap .mrow:nth-child(even) .mvc,
+.replay-wrap .mrow:nth-child(even) .mv,
+.replay-wrap .mrow:nth-child(even) .mv.w,
+.replay-wrap .mrow:nth-child(even) .mv.b {
+  background:#F6ECE2 !important;
+}
+.replay-wrap .mv,
+.replay-wrap .mv.w,
+.replay-wrap .mv.b {
+  border:1px solid rgba(114,88,64,.13) !important;
+  color:#432D27 !important;
+  box-shadow:none !important;
+}
+/* Keep piece colors distinct regardless of the row stripe. */
+.replay-wrap .mv.w .g {
+  color:#FFFFFF !important;
+  -webkit-text-stroke:1.25px #432D27 !important;
+}
+.replay-wrap .mv.b .g {
+  color:#17110F !important;
+  -webkit-text-stroke:0 !important;
+}
+
 </style>
 </head>
 <body>
