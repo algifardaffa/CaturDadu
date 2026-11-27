@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="only light">
-<meta name="theme-color" content="#59483B">
+<meta name="theme-color" content="#432D27">
 <title>Dice Chess</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="assets/favicon.png">
@@ -1108,6 +1108,190 @@ th { color:var(--warm); }
 .mark.none { background:#F5F1EC; color:#887B70; }
 dialog::backdrop { background:rgba(64,53,46,.34); }
 .toast { background:#59483B; color:#fff; box-shadow:0 12px 32px rgba(64,53,46,.18); }
+
+
+
+/* ===== Brown palette from user's reference image =====
+   Dusty peach #D7B7A3 · Espresso #432D27
+   Terracotta #985E49 · Dusty rose #C6978E
+*/
+:root {
+  --bg:#D7B7A3;
+  --surface:#F3E4DA;
+  --cocoa:#432D27;
+  --cocoa-hover:#563A31;
+  --caramel:#985E49;
+  --sand:#C6978E;
+  --warm:#79584D;
+  --tint:#EBD5C9;
+  --ok:#647B5B;
+  --ok-bg:#E4E9DC;
+  --danger:#985E49;
+  --danger-bg:#F0DCD6;
+  --sq-light:#EBD5C9;
+  --sq-dark:#C6978E;
+  --head:#C6978E;
+  --head2:#D7B7A3;
+  --head-ink:#432D27;
+  --btn1:#985E49;
+  --btn2:#824D3D;
+  --btn-line:#744536;
+  --tan1:#C6978E;
+  --tan2:#B78279;
+  --tan-line:#A8736C;
+  --bubble1:#F3E4DA;
+  --bubble2:#EBD5C9;
+  --shadow:0 2px 5px rgba(67,45,39,.08), 0 8px 24px rgba(67,45,39,.12);
+}
+body { background:#D7B7A3 !important; color:#432D27; }
+#nav { background:#432D27; color:#F3E4DA; }
+.profile-btn, .conn, .install-btn { color:#F3E4DA; }
+.profile-text small { color:#D7B7A3; }
+.profile-card, .card, .panel, dialog {
+  background:#F3E4DA;
+  border-color:#C6978E;
+  color:#432D27;
+}
+h1,h2,h3,a { color:#432D27; }
+.muted, .note, .center, label, .field-label, .cmp td.shared,
+.htext small, .seat .who small, .side small, .match-summary .versus-row .muted {
+  color:#79584D;
+}
+.title-row h2 .ico, .cmp-label .ico, h1.ttl .ico { color:#985E49; }
+code, .mark.draw, .cmp .best { background:#EBD5C9; color:#432D27; }
+.card, .panel, .profile-card, dialog, select, input { border-color:#C6978E; }
+button, .button, :where(button,.button) {
+  background:linear-gradient(180deg,#985E49,#824D3D);
+  border-color:#744536;
+  color:#FFF8F3;
+}
+button:hover:not(:disabled), .button:hover:not(.ghost),
+:where(button,.button):hover:not(:disabled) {
+  background:linear-gradient(180deg,#874F3E,#704133);
+  border-color:#704133;
+}
+button.ghost, .button.ghost, .match-summary button.ghost {
+  background:#F3E4DA;
+  color:#432D27;
+  border-color:#C6978E;
+}
+button.ghost:hover:not(:disabled), .button.ghost:hover,
+.match-summary button.ghost:hover:not(:disabled) {
+  background:#EBD5C9;
+  border-color:#985E49;
+}
+button.danger { background:#F3E4DA; color:#985E49; border-color:#C6978E; }
+button.danger:hover:not(:disabled) { background:#F0DCD6; border-color:#985E49; }
+select, input { background:#F8EEE8; color:#432D27; border-color:#C6978E; }
+select:focus, input:focus { border-color:#985E49; box-shadow:0 0 0 3px rgba(152,94,73,.2); }
+input[type=checkbox] { accent-color:#985E49; }
+:focus-visible { outline-color:#985E49; }
+.avatar { background:#EBD5C9; color:#432D27; border-color:#C6978E; }
+.presets button[aria-pressed=true] { background:#432D27; border-color:#432D27; color:#F3E4DA; }
+.dot { background:#C6978E; }
+.dot.on, .conn::before { background:#647B5B; }
+.conn.bad::before { background:#985E49; }
+.conn.connecting::before { background:#C6978E; }
+.spinner { border-color:#C6978E; border-top-color:#985E49; }
+.errbox { border-left-color:#985E49; }
+dl.stats dt, dl.stats dd, th, td { border-color:#C6978E; }
+th { color:#79584D; }
+.cmp tbody tr, .hrow { background:#F3E4DA; }
+.cmp tbody tr:nth-child(even), .hrow:nth-child(even) { background:#EBD5C9; }
+.cmp tbody tr:hover, .hrow:hover { background:#D7B7A3; }
+.cmp thead th, .hhead, .hist-body .filters, .rbar {
+  background:#C6978E;
+  color:#432D27;
+}
+.cmp thead th.num, .hist-body .filters > label { color:#432D27; }
+.hist-body .filters select { background:#F8EEE8; color:#432D27; border-color:#C6978E; }
+.vs { background:#EBD5C9; border-color:#C6978E; color:#79584D; }
+.colorbtn, .bubble .colorbtn, #setupBody .colorbtn {
+  background:#F3E4DA;
+  border-color:#C6978E;
+}
+.colorbtn[aria-checked=true], .bubble .colorbtn[aria-checked=true],
+#setupBody .colorbtn[aria-checked=true] {
+  background:#EBD5C9;
+  border-color:#985E49;
+  box-shadow:0 0 0 2px rgba(152,94,73,.24);
+}
+.colorbtn[aria-checked=true] small, .bubble .colorbtn small,
+#setupBody .colorbtn small { color:#432D27; }
+.board { border-color:#432D27; }
+.board button, .board button:hover:not(:disabled) { background:#EBD5C9; color:#432D27; }
+.board button.dark, .board button.dark:hover:not(:disabled) { background:#C6978E; }
+.board button.last { box-shadow:inset 0 0 0 100px rgba(152,94,73,.34); }
+.board button.selected { box-shadow:inset 0 0 0 3px #985E49, inset 0 0 0 100px rgba(198,151,142,.36); }
+.board button.movable::before { background:radial-gradient(circle closest-side,transparent 114%,rgba(100,123,91,.84) 116%); }
+.board button.movable.selected::before { background:rgba(100,123,91,.58); }
+.board button.target::after { background:rgba(100,123,91,.76); }
+.board button.target.occupied::after { background:none; border-color:rgba(100,123,91,.84); }
+.piece-w { color:#FFF8F3; -webkit-text-stroke:1.5px #432D27; }
+.piece-b { color:#432D27; }
+.coord { color:#432D27; }
+.die { background:#EBD5C9; border-color:#C6978E; }
+.die b { color:#432D27; }
+.wave, #nav .wave, .bubble .wave { color:#C6978E; }
+.bubble, #setupBody > .setup-bubble, .match-summary {
+  background:linear-gradient(180deg,#F8EEE8 0%,#EBD5C9 100%);
+  border-color:#C6978E;
+  box-shadow:0 7px 22px rgba(67,45,39,.12), inset 0 1px 0 rgba(255,248,243,.8);
+}
+.bubble .panel, .bubble > .card.wavy { background:#F3E4DA; border-color:#C6978E; }
+.bubble .versus-row { background:rgba(243,228,218,.78); border-color:rgba(198,151,142,.9); }
+.bubble .vs, #setupBody .vs, .match-summary .vs { background:#EBD5C9; color:#79584D; }
+#setupBody .versus-row .avatar, .match-summary .versus-row .avatar { border-color:#F3E4DA; }
+#setupBody .rollbtn, #setupBody button.rollbtn {
+  background:linear-gradient(180deg,#985E49,#824D3D);
+  border-color:#744536;
+  color:#FFF8F3;
+  box-shadow:0 4px 12px rgba(67,45,39,.18);
+}
+#setupBody .rollbtn:hover:not(:disabled) { background:linear-gradient(180deg,#874F3E,#704133); }
+#setupBody button.ghost:not(.colorbtn), .bubble button.ghost:not(.colorbtn) {
+  background:#F3E4DA; border-color:#C6978E; color:#432D27;
+}
+#setupBody button.ghost:not(.colorbtn):hover:not(:disabled),
+.bubble button.ghost:not(.colorbtn):hover:not(:disabled) {
+  background:#EBD5C9; border-color:#985E49;
+}
+.match-summary .actions2 .button:not(.ghost),
+.match-summary a.button:not(.ghost) {
+  background:linear-gradient(180deg,#985E49,#824D3D);
+  border-color:#744536; color:#FFF8F3;
+}
+.match-summary .actions2 .button:not(.ghost):hover,
+.match-summary a.button:not(.ghost):hover {
+  background:linear-gradient(180deg,#874F3E,#704133);
+}
+.button.replay, .button.replay:hover, .replay-wrap .toolbar button {
+  background:linear-gradient(180deg,#C6978E,#B78279);
+  border:1px solid #A8736C;
+  color:#432D27;
+  box-shadow:0 3px 8px rgba(67,45,39,.12);
+}
+.replay-wrap .toolbar button:hover:not(:disabled), .button.replay:hover:not(:disabled) {
+  background:linear-gradient(180deg,#B9857D,#A8736C);
+  border-color:#985E49;
+}
+.replay-wrap .toolbar button .ico, .toolbar .ico { color:#432D27; }
+.replay-wrap .panel { background:transparent; border-color:transparent; }
+.mrow { background:#F3E4DA; }
+.mrow:nth-child(even) { background:#EBD5C9; }
+.mnum { color:#79584D; }
+.mvc.cur { background:rgba(198,151,142,.3); box-shadow:0 0 0 3px rgba(152,94,73,.2); }
+.mv.w, .mv.b {
+  background:#F3E4DA; border:1px solid #C6978E; color:#432D27; box-shadow:none;
+}
+.mv.w .g { color:#FFF8F3; -webkit-text-stroke:1.2px #432D27; }
+.mv.b .g { color:#17110F; -webkit-text-stroke:0; }
+.mark.win { background:#E4E9DC; color:#52694B; }
+.mark.loss { background:#F0DCD6; color:#985E49; }
+.mark.draw { background:#EBD5C9; color:#432D27; }
+.mark.none { background:#F3E4DA; color:#79584D; }
+dialog::backdrop { background:rgba(67,45,39,.42); }
+.toast { background:#432D27; color:#F3E4DA; box-shadow:0 12px 32px rgba(67,45,39,.2); }
 
 </style>
 </head>
