@@ -727,6 +727,80 @@ body:not(.playing) #secSetup.playcard {
   .replay-wrap > .panel .mrow { min-height:54px; padding:0 10px; }
 }
 
+
+
+/* ===== Refinement v4: white wave bubbles, inner spacing and compact Play controls ===== */
+
+/* Match result bubble: white/ivory base while preserving the existing wave overlay. */
+.match-summary {
+  background:#FFFCF8 !important;
+  padding:20px 20px 18px;
+  border-color:#E9DFD5;
+  box-shadow:0 6px 20px rgba(94,63,43,.075), inset 0 1px 0 rgba(255,255,255,.95);
+}
+.match-summary > .wave-clip {
+  display:block !important;
+  border-radius:inherit;
+}
+
+/* The move-list bubble is white; keep breathing room between its first/last row
+   and the top/bottom edges of the rounded container. */
+.replay-wrap > .panel {
+  background:#FFFCF8 !important;
+  border:1px solid #E9DFD5 !important;
+  border-radius:24px !important;
+  box-shadow:0 5px 18px rgba(94,63,43,.065) !important;
+  padding:12px 0 !important;
+  overflow:hidden;
+}
+.replay-wrap > .panel .mlist {
+  background:#FFFCF8 !important;
+  border-radius:0;
+  padding:0;
+}
+.replay-wrap > .panel .mrow:first-child { margin-top:0; }
+.replay-wrap > .panel .mrow:last-child { margin-bottom:0; }
+
+/* Give the Play setup contents a little more distance from the bubble boundary. */
+#setupBody > .setup-bubble {
+  padding:20px 20px 18px !important;
+  gap:14px;
+}
+#setupBody > .setup-bubble .versus-row {
+  padding:2px 4px 7px;
+}
+#setupBody > .setup-bubble .colorseg {
+  margin:2px 4px 0;
+  gap:10px;
+}
+#setupBody > .setup-bubble .colorbtn {
+  min-height:72px;
+  padding:8px 5px;
+  border-radius:16px;
+  gap:5px;
+}
+#setupBody > .setup-bubble .knight {
+  font-size:1.75rem;
+}
+#setupBody > .setup-bubble .colorbtn small {
+  font-size:11px;
+}
+#setupBody > .setup-bubble #create {
+  margin:0 4px 2px;
+  width:calc(100% - 8px);
+  min-height:48px;
+  border-radius:16px;
+}
+@media (max-width:520px) {
+  .match-summary { padding:17px 14px 15px; }
+  .replay-wrap > .panel { padding:10px 0 !important; border-radius:20px !important; }
+  #setupBody > .setup-bubble { padding:17px 14px 15px !important; gap:12px; }
+  #setupBody > .setup-bubble .colorseg { margin-left:3px; margin-right:3px; gap:7px; }
+  #setupBody > .setup-bubble .colorbtn { min-height:66px; padding:7px 3px; }
+  #setupBody > .setup-bubble .knight { font-size:1.6rem; }
+  #setupBody > .setup-bubble #create { width:calc(100% - 6px); margin-left:3px; margin-right:3px; }
+}
+
 </style>
 </head>
 <body>
@@ -1087,7 +1161,7 @@ function paintSetup() {
           <div class="colorseg" role="radiogroup" aria-label="Pilih warna">${[['w', 'Putih', 'Putih (jalan dulu)'], ['random', 'Acak', 'Acak'], ['b', 'Hitam', 'Hitam']].map(([v, l, t]) =>
             `<button type="button" class="ghost colorbtn" role="radio" data-color="${v}" aria-checked="false" aria-label="${t}"><span class="knight k-${v}" aria-hidden="true">♞&#xFE0E;</span><small>${l}</small></button>`).join('')}</div>
           <input type="hidden" id="color" value="w"></div>
-        <button id="create" class="big">${icon('shuffle')} Buat pertandingan</button></div>`;
+        <button id="create" class="big">${icon('shuffle')} Mulai</button></div>`;
       const setColor = v => { $('#color').value = v; box.querySelectorAll('.colorbtn').forEach(b => b.setAttribute('aria-checked', String(b.dataset.color === v))); };
       box.querySelectorAll('.colorbtn').forEach(b => { b.onclick = () => setColor(b.dataset.color); });
       setColor(chosen || 'w');
