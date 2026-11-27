@@ -1152,6 +1152,25 @@ button[data-act="accept"]:hover:not(:disabled),
   border-top:0 !important;
   border-bottom:1px solid #B6A391 !important;
 }
+
+/* ===== v8: preserve alternating move rows; recolor only outer top/bottom panel ===== */
+/* The move list keeps its existing odd/even stripe colors from the rules above.
+   Only the exposed panel area surrounding the list changes from white to ivory. */
+.replay-wrap > .panel {
+  background-color:#FCF7F3 !important;
+  background-image:none !important;
+  border-color:#E8DED3 !important;
+}
+
+/* History title bar uses exactly the same fill as the Versus table heading. */
+#historyBody .hhead,
+#historyBody .hhead span {
+  background-color:#CCBAAC !important;
+  color:#432D27 !important;
+}
+#historyBody .hhead {
+  background-image:none !important;
+}
 </style>
 </head>
 <body>
