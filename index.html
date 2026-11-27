@@ -625,6 +625,108 @@ body:not(.playing) #secSetup.playcard {
   .match-summary .versus-row strong { font-size:12px; }
   .match-summary .versus-row .muted { font-size:11px; }
 }
+
+
+/* ===== Final requested layout: Play bubble + independent move-list bubble ===== */
+
+/* The Play heading and Quick Start remain outside this single setup bubble.
+   The bubble encloses only players, color choices and Create Match. */
+#setupBody > .setup-bubble {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  padding:18px 16px 16px;
+  border-radius:28px;
+  background:linear-gradient(180deg,#FFFCF8 0%,#E8D7C9 100%);
+  border:1px solid rgba(169,130,97,.20);
+  box-shadow:0 7px 22px rgba(94,63,43,.09), inset 0 1px 0 rgba(255,255,255,.9);
+}
+#setupBody > .setup-bubble > .wave-clip {
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:0;
+  border-radius:inherit;
+  pointer-events:none;
+}
+#setupBody > .setup-bubble > .versus-row,
+#setupBody > .setup-bubble > .colorseg,
+#setupBody > .setup-bubble > div:not(.wave-clip),
+#setupBody > .setup-bubble > button {
+  position:relative;
+  z-index:1;
+}
+#setupBody > .setup-bubble .versus-row {
+  padding:2px 4px 8px;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+#setupBody > .setup-bubble .colorseg { margin-top:0; gap:12px; }
+#setupBody > .setup-bubble .colorbtn {
+  min-height:88px;
+  background:#FFFCF9;
+  border:1px solid #EADFD5;
+  border-radius:19px;
+  box-shadow:0 2px 8px rgba(94,63,43,.045);
+}
+#setupBody > .setup-bubble .colorbtn[aria-checked="true"] {
+  background:#FFFCF9;
+  border:3px solid #5A4030;
+  box-shadow:0 2px 8px rgba(94,63,43,.07);
+}
+#setupBody > .setup-bubble #create {
+  min-height:54px;
+  border-radius:17px;
+  background:linear-gradient(180deg,#5A4030 0%,#45372F 100%);
+  border:1px solid #45372F;
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 4px 10px rgba(94,63,43,.18);
+}
+#setupBody > .setup-bubble #create:hover:not(:disabled) {
+  background:linear-gradient(180deg,#674A38 0%,#503A2E 100%);
+}
+
+/* If the match has just been created and is waiting, retain the exact same
+   outer bubble instead of switching to an unframed player panel. */
+#setupBody > .setup-bubble .note { margin:0; }
+
+/* Replay move notation gets its own standalone rounded white bubble,
+   separate from the chessboard and the navigation toolbar. */
+.replay-wrap > .panel {
+  background:#FFFCF8;
+  border:1px solid #E9DFD5;
+  border-radius:24px;
+  box-shadow:0 5px 18px rgba(94,63,43,.07);
+  overflow:hidden;
+  padding:0;
+}
+.replay-wrap > .panel .mlist {
+  background:#FFFCF8;
+  border-radius:inherit;
+  padding:0;
+  max-height:340px;
+}
+.replay-wrap > .panel .mrow {
+  border-radius:0;
+  padding:0 14px;
+  min-height:58px;
+}
+.replay-wrap > .panel .mrow:nth-child(even) { background:#FAF5EF; }
+.replay-wrap > .panel .mrow:nth-child(odd) { background:#FFFCF8; }
+
+@media (max-width:520px) {
+  #setupBody > .setup-bubble { padding:15px 12px 13px; border-radius:25px; gap:12px; }
+  #setupBody > .setup-bubble .colorseg { gap:8px; }
+  #setupBody > .setup-bubble .colorbtn { min-height:78px; border-radius:16px; }
+  .replay-wrap > .panel { border-radius:20px; }
+  .replay-wrap > .panel .mrow { min-height:54px; padding:0 10px; }
+}
+
 </style>
 </head>
 <body>
@@ -997,7 +1099,7 @@ function paintSetup() {
     const status = presence;
     if (g.status === 'waiting') {
       const mine = g.created_by === boot.me;
-      box.innerHTML = `<div class="card stack wavy">${waveHtml()}<div class="versus-row">${who(g.player_white, 'Putih · ' + status(g.player_white))}
+      box.innerHTML = `<div class="card stack wavy setup-bubble">${waveHtml()}<div class="versus-row">${who(g.player_white, 'Putih · ' + status(g.player_white))}
         <div class="vs" aria-hidden="true">VS</div>${who(g.player_black, 'Hitam · ' + status(g.player_black))}</div>
         <p class="note">${mine ? 'Menunggu lawan menerima…' : 'Kamu diajak bermain.'}</p>
         ${mine ? '<button class="ghost big" data-act="cancel">Batalkan</button>'
