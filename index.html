@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 /* Dice Chess — Velvet Cocoa / Espresso, minimalis & elegan (mode terang saja). Font: Inter. */
 :root {
@@ -356,6 +356,10 @@ body.playing #nav { padding-top:.5rem; margin-bottom:.6rem; } body.playing .site
   .seat.bottom { padding:4px 8px; } .seat.bottom .who { min-height:130px; }
   .passnote { line-height:1.2; }
 }
+.board button, .rollbtn { touch-action:manipulation; -webkit-tap-highlight-color:transparent; user-select:none; }
+.board button { transition:none; }
+.board { contain:layout paint; }
+.slot.die.rolling, .tray.shaking .slot { will-change:transform; }
 </style>
 </head>
 <body>
@@ -392,6 +396,7 @@ const REASONS = { king_captured: 'Raja dimakan', resignation: 'Menyerah', agreem
 let sb = null;                       // Supabase client
 let boot = { me: null, players: [] };// me = uuid of signed-in player
 let live = null, online = [], selected = null, busy = false, replayTimer, lastRollSeen = null;
+let lastSync = 0, realtimeProven = false, pendingPick = null, lastAnimatedMove = '', rollShownAt = 0;
 let watching = null;                 // id of the active game we are following (for the end-of-game summary)
 let channels = [], pollTimer = null, syncTimer = null, connState = 'connecting';
 const historyQuery = { filter: 'all', sort: 'newest', page: 1 };
@@ -477,6 +482,34 @@ function confirmBox(title, text) {
     modal.onclose = () => resolve(modal.returnValue === 'yes');
     modal.showModal();
   });
+}
+
+// ---- pembaruan DOM selektif: hanya node yang berubah yang disentuh ----
+function patchNode(old, next) {
+  if (old.nodeType !== next.nodeType || old.nodeName !== next.nodeName) return old.replaceWith(next);
+  if (old.nodeType !== 1) { if (old.nodeValue !== next.nodeValue) old.nodeValue = next.nodeValue; return; }
+  for (const { name } of [...old.attributes]) if (!next.hasAttribute(name)) old.removeAttribute(name);
+  for (const { name, value } of [...next.attributes]) if (old.getAttribute(name) !== value) old.setAttribute(name, value);
+  patchChildren(old, next);
+}
+function patchChildren(old, next) {
+  const a = [...old.childNodes], b = [...next.childNodes];
+  b.forEach((node, i) => (a[i] ? patchNode(a[i], node) : old.appendChild(node)));
+  a.slice(b.length).forEach(node => node.remove());
+}
+function patchHtml(box, html) {
+  if (!box.querySelector('.arena')) box.textContent = '';
+  const template = document.createElement('template');
+  template.innerHTML = html.replace(/>\s+</g, '><').trim();
+  patchChildren(box, template.content);
+}
+// Geser bidak dari petak asal (hanya transform, tanpa menggambar ulang papan).
+function slide(from, to) {
+  if (!prefs.animation) return;
+  const a = $(`#setupBody [data-sq="${from}"]`), b = $(`#setupBody [data-sq="${to}"]`), piece = b?.querySelector('span:not(.coord)');
+  if (!a || !piece?.animate) return;
+  const dx = a.offsetLeft - b.offsetLeft, dy = a.offsetTop - b.offsetTop;
+  piece.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'none' }], { duration: 160, easing: 'ease-out' });
 }
 
 // ---- board ----
@@ -695,15 +728,15 @@ function paintSetup() {
       const previous = live.rolls.at(-1);
       const passed = !roll && previous && !live.moves.some(m => m.turn_id === previous.turn_id) ? previous : null;
       const shown = roll || passed;
-      const animate = prefs.animation && shown && lastRollSeen !== shown.id;
-      lastRollSeen = shown?.id ?? lastRollSeen;
+      if (shown && lastRollSeen !== shown.id) { lastRollSeen = shown.id; rollShownAt = Date.now(); }
+      const animate = prefs.animation && shown && Date.now() - rollShownAt < 500;
       // Daftar gerakan legal dari database sudah memperhitungkan dadu yang belum terpakai.
       const legal = myTurn && roll ? live.legal : [];
       const targets = legal.filter(m => m.from === selected).map(m => m.to);
       const last = live.moves.at(-1);
       const offer = g.draw_offer_by ? ['draw', g.draw_offer_by, 'remis'] : g.abandon_offer_by
         ? ['abandon', g.abandon_offer_by, 'menghentikan pertandingan'] : null;
-      const hint = !myTurn ? (roll ? 'Lawan sedang bergerak' : 'Menunggu lawan melempar')
+      const hint = live.pending ? 'Mengirim…' : !myTurn ? (roll ? 'Lawan sedang bergerak' : 'Menunggu lawan melempar')
         : needRoll ? 'Ketuk Roll' : selected ? 'Pilih petak tujuan'
         : legal.length ? 'Pilih bidak hijau' : 'Tidak ada gerakan';
       const dieOwner = shown ? (shown.player_id === g.player_white ? 'w' : 'b') : 'w';
@@ -715,7 +748,7 @@ function paintSetup() {
           aria-label="${NAMES[kind]}${used ? ', terpakai' : ''}"><b class="piece-${dieOwner}" aria-hidden="true">${glyph(kind)}</b></div>`;
       }).join('');
       const face = (id, turnNow) => `<span class="pface ${turnNow ? 'active' : ''}">${avatar(player(id)?.avatar)}</span>`;
-      box.innerHTML = `<div class="match arena-wrap"><div class="arena">
+      patchHtml(box, `<div class="match arena-wrap"><div class="arena">
         <div class="seat top">
           <div class="side"></div>
           <div class="who">${face(opponent, !myTurn)}<span class="pname">${name(opponent)}</span>
@@ -737,9 +770,12 @@ function paintSetup() {
         <div class="stack">
           ${offer ? `<div class="card"><p>${name(offer[1])} mengajukan ${offer[2]}.</p>${offer[1] === boot.me ? '' :
             `<div class="row"><button data-act="${offer[0]}">Setuju</button><button class="ghost" data-act="decline">Tolak</button></div>`}</div>` : ''}
-        </div></div>`;
+        </div></div>`);
+      if (last) {
+        const key = `${g.id}:${last.from_square}${last.to_square}`;
+        if (key !== lastAnimatedMove) { lastAnimatedMove = key; slide(last.from_square, last.to_square); }
+      }
     }
-    box.querySelectorAll('[data-act]').forEach(b => b.onclick = () => gameAction(b.dataset.act));
 }
 function paintHistory(data) {
   const box = $('#historyBody');
@@ -783,10 +819,10 @@ async function reloadHistory(scroll = false) {
 // ---- pages ----
 const pages = {
   async home() {
-    const [stats, hist] = await Promise.all([rpc('get_statistics'),
+    const data = Promise.all([rpc('get_statistics'),
       rpc('list_games', { p_filter: historyQuery.filter, p_sort: historyQuery.sort, p_page: historyQuery.page })]);
+    data.catch(() => {});
     return () => {
-      homeStats = stats;
       view.innerHTML = `
         <section class="sec" id="secSetup"><div class="title-row"><h2>${icon('crown')}Match setup</h2>
           <button type="button" class="link" id="quickStart" title="Buat pertandingan dengan warna acak">Quick Start →</button></div><div id="setupBody"></div></section>
@@ -794,7 +830,12 @@ const pages = {
           <button type="button" class="link" id="h2hMore"></button></div><div id="h2hBody"></div></section>
         <section class="sec panel" id="secHistory"><div class="title-row"><h2>${icon('clock')}Game history</h2>
           <button type="button" class="link" id="historyMore" hidden></button></div><div id="historyBody"></div></section>`;
-      paintSetup(); paintH2H(); paintHistory(hist); updateHeader();
+      paintSetup();
+      const anchor = $('#historyBody');
+      data.then(([stats, hist]) => {
+        if (!anchor.isConnected) return;
+        homeStats = stats; paintH2H(); paintHistory(hist); updateHeader();
+      }).catch(e => { console.error('[home]', e); toast(friendly(e)); });
     };
   },
   async match(id) {
@@ -897,20 +938,49 @@ async function gameAction(act) {
   if (act === 'roll') paintSetup();   // pulihkan tombol bila lemparan gagal
 }
 function clickSquare(sq) {
-  if (busy || !live) return;
+  if (!live) return;
+  if (live.pending) { pendingPick = sq; return; }     // diingat, diterapkan begitu jawaban server tiba
+  if (busy) return;
   const options = live.legal.filter(m => m.from === selected && m.to === sq);
   if (!options.length) {
-    selected = live.legal.some(m => m.from === sq) && selected !== sq ? sq : null;
+    const next = live.legal.some(m => m.from === sq) && selected !== sq ? sq : null;
+    if (next === selected) return;
+    selected = next;
     return paintSetup();
   }
-  const g = live.game;
-  const send = uci => { selected = null; beep(); run(() => rpc('make_move', { p_game_id: g.id, p_uci: uci, p_expected_version: g.version })); };
-  if (options.length === 1) return send(options[0].uci);
+  if (options.length === 1) return sendMove(options[0]);
   modal.innerHTML = `<h2>Promosi pion</h2><form method="dialog" class="row">${options.map(o =>
     `<button value="${o.uci}">${NAMES[o.promo]}</button>`).join('')}<button class="ghost" value="">Batal</button></form>`;
   modal.returnValue = '';
-  modal.onclose = () => modal.returnValue && send(modal.returnValue);
+  modal.onclose = () => { const o = options.find(x => x.uci === modal.returnValue); if (o) sendMove(o); };
   modal.showModal();
+}
+// Hanya untuk tampilan sementara; keabsahan gerakan tetap diputuskan database.
+function previewFen(fen, { from, to, promo }) {
+  const [placement, ...rest] = fen.split(' ');
+  const cells = placement.replace(/\d/g, n => '1'.repeat(+n)).replace(/\//g, '').split('');
+  const at = q => (8 - +q[1]) * 8 + 'abcdefgh'.indexOf(q[0]);
+  const a = at(from), b = at(to), piece = cells[a], white = piece === piece.toUpperCase();
+  if (piece.toLowerCase() === 'p' && from[0] !== to[0] && cells[b] === '1') cells[b + (white ? 8 : -8)] = '1';   // en passant
+  if (piece.toLowerCase() === 'k' && Math.abs(b - a) === 2) {                                                   // rokade
+    const rookFrom = b > a ? a + 3 : a - 4, rookTo = (a + b) / 2;
+    cells[rookTo] = cells[rookFrom]; cells[rookFrom] = '1';
+  }
+  cells[b] = promo ? (white ? promo.toUpperCase() : promo) : piece;
+  cells[a] = '1';
+  const rows = cells.join('').match(/.{8}/g).map(r => r.replace(/1+/g, m => m.length));
+  return [rows.join('/'), ...rest].join(' ');
+}
+async function sendMove(move) {
+  if (busy) return;
+  const before = live, g = before.game;
+  selected = null; pendingPick = null;
+  live = { ...before, pending: true, legal: [], game: { ...g, current_fen: previewFen(g.current_fen, move) },
+    moves: [...before.moves, { turn_id: null, from_square: move.from, to_square: move.to, die_indexes: [] }] };
+  paintSetup();                                        // bidak langsung pindah
+  beep();
+  await run(() => rpc('make_move', { p_game_id: g.id, p_uci: move.uci, p_expected_version: g.version }),
+    () => { live = before; lastAnimatedMove = ''; paintSetup(); });   // ditolak server: kembalikan
 }
 
 // Ketuk (atau Enter) pada profil sendiri membuka card edit profil.
@@ -923,6 +993,11 @@ function openOwnProfile(event) {
 view.addEventListener('click', openOwnProfile);
 view.addEventListener('keydown', e => { if (e.key === 'Enter') openOwnProfile(e); });
 
+// Satu listener untuk semua tombol aksi (tidak pernah terpasang ganda).
+view.addEventListener('click', event => {
+  const button = event.target.closest('#setupBody [data-act]');
+  if (button && !button.disabled) gameAction(button.dataset.act);
+});
 // Satu listener untuk seluruh papan. Tetap bekerja meskipun isi view dirender ulang.
 view.addEventListener('click', event => {
   const square = event.target.closest('#setupBody .board button[data-sq]');
@@ -931,13 +1006,14 @@ view.addEventListener('click', event => {
   clickSquare(square.dataset.sq);
 });
 // Serializes user actions: while one request is in flight, further clicks are ignored (no duplicate submits).
-async function run(fn) {
+async function run(fn, rollback) {
   if (busy) return;
   busy = true;
   try { await fn(); }
-  catch (e) { console.error(e); toast(isStale(e) ? 'Status berubah, memuat ulang…' : friendly(e)); }
+  catch (e) { console.error(e); rollback?.(); toast(isStale(e) ? 'Status berubah, memuat ulang…' : friendly(e)); }
+  try { await sync({ fresh: true }); }
   finally { busy = false; }
-  await sync();
+  if (live?.pending) { live = { ...live, pending: false }; paintSetup(); }
 }
 
 
@@ -1054,34 +1130,55 @@ function setConn(state) {
 }
 
 // ---- synchronisation: Realtime is only a "something changed" hint; get_live_state() is the truth ----
-let syncing = false, again = false;
-function scheduleSync(delay = 120) { clearTimeout(syncTimer); syncTimer = setTimeout(sync, delay); }
-async function sync() {
-  if (!boot.me) return;
-  if (syncing) { again = true; return; }
-  syncing = true;
-  try {
-    do {
-      again = false;
-      const next = await rpc('get_live_state');
-      // never let an older snapshot overwrite a newer one
-      if (next && live && next.game.id === live.game.id && next.game.version < live.game.version) continue;
-      const changed = JSON.stringify([live?.game.id, live?.game.version]) !== JSON.stringify([next?.game.id, next?.game.version]);
-      live = next;
-      if (changed) selected = null;
-      const onHome = isHome();
-      if (live?.game.status === 'active') watching = live.game.id;
-      else if (watching && !live) {
-        const finished = watching; watching = null;
-        if (onHome) { location.hash = 'match/' + finished; continue; }
-      }
-      if (changed && onHome) paintSetup();
-      if (changed && !onHome && live?.game.status === 'waiting' && live.game.created_by !== boot.me)
-        toast('Ada ajakan bermain. Kembali ke halaman utama.');
-    } while (again);
-    if (connState !== 'ok' && channels.length) setConn('ok');
-  } catch (e) { console.error('[sync]', e); setConn('bad'); toast(friendly(e)); }
-  finally { syncing = false; }
+let inFlight = null, again = false, wanted = null;
+function scheduleSync(delay = 60) { clearTimeout(syncTimer); syncTimer = setTimeout(() => sync(), delay); }
+const behind = () => wanted && (!live || live.game.id !== wanted.id ? wanted.open : live.game.version < wanted.version);
+// fresh = minta data yang lebih baru daripada permintaan yang sedang berjalan.
+function sync({ fresh = false } = {}) {
+  if (!boot.me) return Promise.resolve();
+  if (inFlight) { if (fresh) again = true; return inFlight; }
+  inFlight = (async () => {
+    try {
+      do {
+        again = false;
+        await applyState(await rpc('get_live_state'));
+        lastSync = Date.now();
+      } while (again || behind());
+      wanted = null;
+      if (connState !== 'ok' && channels.length) setConn('ok');
+    } catch (e) { console.error('[sync]', e); wanted = null; setConn('bad'); toast(friendly(e)); }
+    finally { inFlight = null; }
+  })();
+  return inFlight;
+}
+async function applyState(next) {
+  // snapshot lama tidak boleh menimpa yang lebih baru (atau tampilan langkah yang sedang dikirim)
+  if (next && live && next.game.id === live.game.id &&
+      (next.game.version < live.game.version || (live.pending && next.game.version === live.game.version))) return;
+  const changed = !!live?.pending || live?.game.id !== next?.game.id || live?.game.version !== next?.game.version;
+  live = next;
+  if (changed) {
+    selected = pendingPick && live?.legal.some(m => m.from === pendingPick) ? pendingPick : null;
+    pendingPick = null;
+  }
+  const onHome = isHome();
+  if (live?.game.status === 'active') watching = live.game.id;
+  else if (watching && !live) {
+    const finished = watching; watching = null;
+    if (onHome) { location.hash = 'match/' + finished; return; }
+  }
+  if (changed && onHome) paintSetup();
+  if (changed && !onHome && live?.game.status === 'waiting' && live.game.created_by !== boot.me)
+    toast('Ada ajakan bermain. Kembali ke halaman utama.');
+}
+// Realtime memberi tahu versi terbaru: lewati bila layar sudah memuatnya.
+function onGameChange(payload) {
+  realtimeProven = true;
+  const row = payload?.new;
+  if (row?.id == null) return scheduleSync();
+  if (live && live.game.id === row.id && row.version <= live.game.version && !live.pending) return;
+  wanted = { id: row.id, version: row.version, open: row.status !== 'completed' && row.status !== 'abandoned' };
+  if (!busy && !inFlight) scheduleSync();             // saat busy, run() sendiri yang menyinkronkan
 }
 
 function teardownRealtime() {
@@ -1091,23 +1188,30 @@ function teardownRealtime() {
 function setupRealtime() {
   teardownRealtime();
   const games = sb.channel('dice-chess-games')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'game_sessions' }, () => scheduleSync(80))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'game_sessions' }, onGameChange)
     .subscribe(status => {
-      if (status === 'SUBSCRIBED') { setConn('ok'); scheduleSync(0); }       // (re)connected: refetch authoritative state
+      if (status === 'SUBSCRIBED') { setConn('ok'); if (Date.now() - lastSync > 1500) scheduleSync(0); }       // (re)connected: refetch authoritative state
       else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') setConn('bad');
     });
   const presence = sb.channel('dice-chess-presence', { config: { presence: { key: boot.me } } });
   presence.on('presence', { event: 'sync' }, () => {
-    online = Object.keys(presence.presenceState());
+    const next = Object.keys(presence.presenceState()).sort();
+    if (next.join() === [...online].sort().join()) return;
+    online = next;
     if (isHome() && !busy) paintSetup();
   }).subscribe(async status => { if (status === 'SUBSCRIBED') await presence.track({ at: Date.now() }); });
   channels = [games, presence];
   // Safety net if a realtime message is ever missed.
-  pollTimer = setInterval(() => { if (!document.hidden) sync(); }, 15000);
+  // Cadangan saja: diperpanjang bila Realtime terbukti mengirim, dan diam saat tab di belakang.
+  pollTimer = setInterval(() => {
+    if (document.hidden || busy) return;
+    if (realtimeProven && connState === 'ok' && Date.now() - lastSync < 45000) return;
+    sync();
+  }, 15000);
 }
 window.addEventListener('online', () => { scheduleSync(0); });
 window.addEventListener('offline', () => setConn('bad'));
-document.addEventListener('visibilitychange', () => { if (!document.hidden && boot.me) scheduleSync(0); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) clearInterval(replayTimer); else if (boot.me) scheduleSync(0); });
 window.addEventListener('hashchange', () => {
   if (!boot.me) return;
   selected = null; $('#toast').textContent = ''; render(true); window.scrollTo(0, 0);
@@ -1147,10 +1251,10 @@ async function start(route) {
     const info = await rpc('get_session_info');
     if (!info.registered) return claimScreen(info);
     boot.me = session.user.id;
-    await fetchPlayers();
+    const [, current] = await Promise.all([fetchPlayers(), rpc('get_live_state')]);
     $('#nav').hidden = false;
     if (route) history.replaceState(null, '', '#' + route);
-    live = await rpc('get_live_state');
+    live = current; lastSync = Date.now();
     if (live?.game.status === 'active') watching = live.game.id;
     setupRealtime();
     await render(true);
