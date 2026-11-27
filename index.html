@@ -301,6 +301,61 @@ button.link { background:none; border:0; padding:6px 0; color:var(--espresso); f
 }
 @media (max-width:420px) { .conn { font-size:0; gap:0; padding:0; width:40px; justify-content:center; } .install-btn { width:40px; min-height:40px; } }
 button.link:hover:not(:disabled) { background:none; border-color:transparent; }
+
+/* ==== Area permainan ==== */
+body.playing #secSetup > .title-row { display:none; }
+body.playing #secSetup { margin-top:0; }
+.arena { --board:min(100%, 560px, max(300px, calc(100dvh - 430px))); display:flex; flex-direction:column; align-items:center; gap:10px; min-width:0; }
+.match.arena-wrap { grid-template-columns:minmax(0,1fr); max-width:44rem; margin:0 auto; }
+.arena .board { width:var(--board); max-width:none; margin:0; border:5px solid var(--caramel); }
+.seat { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:8px; width:100%; padding:8px; border-radius:var(--radius-lg); background:var(--paper); }
+.seat .who { display:flex; flex-direction:column; align-items:center; min-width:110px; line-height:1.25; }
+.seat .who small, .side small { color:var(--muted); font-size:.75rem; }
+.seat.bottom .who { min-height:142px; justify-content:flex-end; }   /* tinggi tetap: Roll tidak menggeser tata letak */
+.side { display:flex; flex-direction:column; min-width:0; font-size:.9rem; padding-left:6px; }
+.side.right { align-items:flex-end; padding:0 4px 0 0; }
+.side.right button { padding:8px 12px; text-align:center; }
+.pname { font-weight:600; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pface { display:grid; place-items:center; width:72px; height:72px; margin-bottom:4px; border-radius:50%; border:3px solid var(--line-2); }
+.pface .avatar { width:60px; height:60px; font-size:32px; }
+.pface.active { border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,36,24,.18); }
+.seat.bottom .pface { width:96px; height:96px; } .seat.bottom .pface .avatar { width:84px; height:84px; font-size:44px; }
+#setupBody button.rollbtn { width:96px; height:96px; min-height:0; margin-bottom:4px; padding:0; flex-direction:column; gap:0; border-radius:50%;
+  border:4px solid var(--caramel); background:var(--accent); color:var(--on-accent); font-size:1.15rem; font-weight:700; letter-spacing:.06em;
+  box-shadow:0 6px 18px rgba(59,36,24,.35); touch-action:manipulation; }
+#setupBody button.rollbtn:active { transform:scale(.95); }
+.rollbtn svg { width:34px; height:34px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.tray { display:grid; grid-template-columns:repeat(3,72px); justify-content:center; gap:16px; padding:10px 22px; border-radius:999px; background:var(--soft); border:1px solid var(--line-2); }
+.slot { width:72px; height:72px; border-radius:var(--radius); }
+.slot.empty { border:2px dashed var(--line-2); }
+.slot.die { position:relative; background:#9A6F52; border:2px solid var(--accent); }
+.slot.die b { font-size:2.9rem; color:#fff; }
+.slot.die b.piece-b { color:var(--espresso); -webkit-text-stroke:0; }
+.slot.die b.piece-w { -webkit-text-stroke:1.5px var(--espresso); }
+.slot.die.used { opacity:.38; border-style:dashed; }
+.slot.die.used::after { content:"✓"; position:absolute; right:4px; bottom:2px; font-size:1rem; font-weight:700; color:var(--espresso); }
+.slot.die.passed { opacity:.6; }
+.passnote { font-size:.8rem; color:var(--muted); text-align:center; }
+.tray.shaking .slot { animation:shake .35s linear infinite; }
+@keyframes shake { 25% { transform:rotate(12deg) translateY(-3px); } 75% { transform:rotate(-12deg) translateY(3px); } }
+/* bidak yang bisa digerakkan: hijau transparan; tujuan: titik coklat */
+.board button > span:not(.coord) { position:relative; z-index:1; }
+.board button.movable::before { content:""; position:absolute; inset:0; background:radial-gradient(circle closest-side, transparent 114%, rgba(128,184,90,.92) 116%); }
+.board button.movable.selected::before { background:rgba(128,184,90,.85); }
+.board button.target::after { z-index:2; }
+@media (max-width:520px) {
+  .tray { grid-template-columns:repeat(3,60px); gap:10px; padding:8px 16px; } .slot { width:60px; height:60px; } .slot.die b { font-size:2.4rem; }
+  .pface { width:60px; height:60px; } .pface .avatar { width:50px; height:50px; font-size:26px; }
+  .seat { padding:6px; gap:4px; } .seat .who { min-width:100px; } .side { font-size:.8rem; padding-left:2px; } .side.right button { font-size:.78rem; padding:6px 8px; }
+}
+@media (prefers-reduced-motion:reduce) { .tray.shaking .slot { animation:none; } }
+body.playing #nav { padding-top:.5rem; margin-bottom:.6rem; } body.playing .site-header { padding-bottom:.5rem; }
+@media (max-height:900px) {
+  .arena { gap:7px; }
+  .seat.top { padding:4px 8px; } .seat.top .who { flex-direction:row; gap:8px; } .seat.top .pface { width:46px; height:46px; margin:0; } .seat.top .pface .avatar { width:36px; height:36px; font-size:20px; }
+  .seat.bottom { padding:4px 8px; } .seat.bottom .who { min-height:130px; }
+  .passnote { line-height:1.2; }
+}
 </style>
 </head>
 <body>
@@ -439,7 +494,7 @@ function boardHtml(fen, { flip = false, last = [], sel = null, targets = [], mov
     const sq = 'abcdefgh'[f] + (8 - r);
     const cls = [(f + r) % 2 ? 'dark' : '', last.includes(sq) ? 'last' : '', sel === sq ? 'selected' : '',
       targets.includes(sq) ? 'target' : '', p ? 'occupied' : '',
-      movable.includes(sq) || targets.includes(sq) ? 'can' : ''].join(' ');
+      movable.includes(sq) || targets.includes(sq) ? 'can' : '', movable.includes(sq) ? 'movable' : ''].join(' ');
     const color = p && (p === p.toUpperCase() ? 'w' : 'b');
     return `<button class="${cls}" data-sq="${sq}" aria-label="${sq}${p ? ` ${NAMES[p.toLowerCase()]} ${color === 'w' ? 'putih' : 'hitam'}` : ''}">
       ${p ? `<span class="piece-${color}">${GLYPH[p.toLowerCase()]}︎</span>` : ''}
@@ -635,37 +690,54 @@ function paintSetup() {
         <button class="ghost" data-act="cancel">${mine ? 'Batalkan' : 'Tolak'}</button></div></div>`;
     } else {
       const myTurn = live.turn.player_id === boot.me, roll = live.roll;
-      const shown = roll || live.rolls.at(-1);          // show the last roll while the next one is pending
+      const needRoll = myTurn && !roll;
+      // Lemparan yang langsung dilewati (tanpa gerakan) tetap diperlihatkan sampai lemparan berikutnya.
+      const previous = live.rolls.at(-1);
+      const passed = !roll && previous && !live.moves.some(m => m.turn_id === previous.turn_id) ? previous : null;
+      const shown = roll || passed;
       const animate = prefs.animation && shown && lastRollSeen !== shown.id;
-      lastRollSeen = shown?.id ?? null;
-      const shownUsed = !shown ? [] : roll ? live.used
-        : live.moves.filter(m => m.turn_id === shown.turn_id).flatMap(m => m.die_indexes);
+      lastRollSeen = shown?.id ?? lastRollSeen;
+      // Daftar gerakan legal dari database sudah memperhitungkan dadu yang belum terpakai.
+      const legal = myTurn && roll ? live.legal : [];
+      const targets = legal.filter(m => m.from === selected).map(m => m.to);
       const last = live.moves.at(-1);
-      const targets = live.legal.filter(m => m.from === selected).map(m => m.to);
       const offer = g.draw_offer_by ? ['draw', g.draw_offer_by, 'remis'] : g.abandon_offer_by
         ? ['abandon', g.abandon_offer_by, 'menghentikan pertandingan'] : null;
-      box.innerHTML = `<div class="match"><div>
-        <div class="card">${who(opponent, `${color(opponent)} · ${status(opponent)}`)}</div>
+      const hint = !myTurn ? (roll ? 'Lawan sedang bergerak' : 'Menunggu lawan melempar')
+        : needRoll ? 'Ketuk Roll' : selected ? 'Pilih petak tujuan'
+        : legal.length ? 'Pilih bidak hijau' : 'Tidak ada gerakan';
+      const dieOwner = shown ? (shown.player_id === g.player_white ? 'w' : 'b') : 'w';
+      const usedNow = roll ? live.used : [];
+      const tray = [0, 1, 2].map(i => {
+        if (!shown) return '<div class="slot empty"></div>';
+        const kind = DIE[shown.dice_values[i]], used = usedNow.includes(i);
+        return `<div class="slot die ${used ? 'used' : ''} ${passed ? 'passed' : ''} ${animate ? 'rolling' : ''}" role="img"
+          aria-label="${NAMES[kind]}${used ? ', terpakai' : ''}"><b class="piece-${dieOwner}" aria-hidden="true">${glyph(kind)}</b></div>`;
+      }).join('');
+      const face = (id, turnNow) => `<span class="pface ${turnNow ? 'active' : ''}">${avatar(player(id)?.avatar)}</span>`;
+      box.innerHTML = `<div class="match arena-wrap"><div class="arena">
+        <div class="seat top">
+          <div class="side"></div>
+          <div class="who">${face(opponent, !myTurn)}<span class="pname">${name(opponent)}</span>
+            <small>${color(opponent)} · ${status(opponent)}</small></div>
+          <div class="side right"></div></div>
+        <div class="tray" role="group" aria-label="Hasil dadu" aria-live="polite">${tray}</div>
+        ${passed ? `<p class="passnote">Tidak ada langkah legal, giliran ${name(passed.player_id)} dilewati.</p>` : ''}
         ${boardHtml(g.current_fen, { flip: flipFor(g.player_white), sel: selected, targets,
-          movable: live.legal.map(m => m.from), last: last ? [last.from_square, last.to_square] : [] })}
-        <div class="card">${who(boot.me, `${color(boot.me)} · kamu`)}</div></div>
-        <div class="stack"><div class="card turn"><h2>${myTurn ? 'Giliranmu' : `Giliran ${name(live.turn.player_id)}`}</h2>
-          <p class="muted">${esc(g.game_code)} · giliran ${live.turn.turn_number} · berlangsung</p>
-          ${shown ? `${roll ? '' : `<p class="muted">Lemparan terakhir (${name(shown.player_id)}):</p>`}${diceHtml(shown.dice_values, shownUsed, animate)}
-            ${!roll && !shownUsed.length ? '<p>Tidak ada langkah legal, giliran dilewati.</p>' : ''}` : '<p>Belum ada lemparan.</p>'}
-          <div class="row" style="margin-top:12px"><button data-act="roll" ${myTurn && !roll ? '' : 'disabled'}>Kocok dadu</button>
-            <button class="ghost" data-act="endturn" ${myTurn && roll && live.used.length ? '' : 'disabled'}>Akhiri giliran</button></div>
-          ${roll ? `<p class="muted">${myTurn ? (selected ? `Terpilih: ${selected}. Pilih petak tujuan.`
-            : live.legal.length ? (live.used.length ? 'Lanjut gerak, atau akhiri giliran kapan saja.' : 'Pilih bidak, lalu petak tujuan.')
-            : 'Tidak ada gerakan lagi. Giliran selesai otomatis.') : 'Menunggu lawan bergerak.'}</p>` : ''}</div>
-        ${offer ? `<div class="card"><p>${name(offer[1])} mengajukan ${offer[2]}.</p>${offer[1] === boot.me ? '' :
-          `<div class="row"><button data-act="${offer[0]}">Setuju</button><button class="ghost" data-act="decline">Tolak</button></div>`}</div>` : ''}
-        <div class="card"><h3>Langkah</h3><p>${live.moves.slice(-9).map(m => `${m.move_number}. ${esc(m.move_san)}`).join(' · ') || 'Belum ada.'}</p>
-          <h3>Riwayat dadu</h3><p class="muted">${live.rolls.slice(-5).reverse().map(r =>
-            `${name(r.player_id)}: <span class="dice-line">${diceGlyphs(r.dice_values)}</span>`).join('<br>') || 'Belum ada.'}</p>
-          <div class="row"><button class="ghost" data-act="draw">Ajukan remis</button>
-          <button class="ghost" data-act="abandon">Ajukan berhenti</button>
-          <button class="ghost" data-act="resign">Menyerah</button></div></div></div></div>`;
+          movable: legal.map(m => m.from), last: last ? [last.from_square, last.to_square] : [] })}
+        <div class="seat bottom">
+          <div class="side"><strong>${myTurn ? 'Giliranmu' : `Giliran ${name(live.turn.player_id)}`}</strong><small>${hint}</small></div>
+          <div class="who">
+            ${needRoll ? `<button type="button" class="rollbtn" data-act="roll" aria-label="Lempar tiga dadu">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9a8 8 0 0 1 13-3l2 2M20 4v4h-4M19 15a8 8 0 0 1-13 3l-2-2M4 20v-4h4"/></svg><span>ROLL</span></button>`
+              : `<span data-me role="button" tabindex="0" aria-label="Edit profil">${face(boot.me, myTurn)}</span>`}
+            <span class="pname" data-me>${name(boot.me)}</span><small>${color(boot.me)} · kamu</small></div>
+          <div class="side right"><button type="button" class="ghost" data-act="resign">Menyerah</button></div></div>
+        </div>
+        <div class="stack">
+          ${offer ? `<div class="card"><p>${name(offer[1])} mengajukan ${offer[2]}.</p>${offer[1] === boot.me ? '' :
+            `<div class="row"><button data-act="${offer[0]}">Setuju</button><button class="ghost" data-act="decline">Tolak</button></div>`}</div>` : ''}
+        </div></div>`;
     }
     box.querySelectorAll('[data-act]').forEach(b => b.onclick = () => gameAction(b.dataset.act));
 }
@@ -813,9 +885,16 @@ async function gameAction(act) {
   if (act === 'abandon' && !await confirmBox('Ajukan berhenti?', 'Pertandingan dihentikan tanpa hasil bila lawan setuju.')) return;
   if (act === 'cancel' && g.created_by !== boot.me && !await confirmBox('Tolak ajakan?', 'Pertandingan akan dibatalkan.')) return;
   if (act === 'endturn' && live.legal.length && !await confirmBox('Akhiri giliran?', 'Masih ada gerakan legal. Dadu yang tersisa akan hangus.')) return;
-  if (act === 'roll') beep();
   const [fn, args] = ACTIONS[act](g.id);
-  run(() => rpc(fn, { ...args, p_expected_version: g.version }));
+  if (act === 'roll') {
+    if (busy) return;
+    beep();
+    const button = $('.rollbtn');
+    if (button) button.disabled = true;
+    if (prefs.animation) $('.tray')?.classList.add('shaking');
+  }
+  await run(() => rpc(fn, { ...args, p_expected_version: g.version }));
+  if (act === 'roll') paintSetup();   // pulihkan tombol bila lemparan gagal
 }
 function clickSquare(sq) {
   if (busy || !live) return;
