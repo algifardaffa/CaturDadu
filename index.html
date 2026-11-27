@@ -403,22 +403,133 @@ a.button:not(.ghost), a.button:not(.ghost):hover, .button.replay, .button.replay
 .actions2 > * { width:100%; min-width:0; }
 
 /* ==== Revisi: kepala tabel coklat, bubble hitam coklat tua, filter inline ==== */
-:root { --head:#9C7556; }
-.cmp thead th { background:var(--head); color:#fff; border-bottom:0; }
-.cmp thead th.num { color:#fff; }
+:root { --head:#CDB398; --head-ink:#493323; }
+.cmp thead th { background:var(--head); color:var(--head-ink); border-bottom:0; }
+.cmp thead th.num { color:var(--head-ink); }
 .cmp thead th:first-child { border-top-left-radius:calc(var(--r-lg) - 1px); } .cmp thead th:last-child { border-top-right-radius:calc(var(--r-lg) - 1px); }
-.hhead { display:flex; align-items:center; gap:12px; padding:10px 16px; background:var(--head); color:#fff; font-size:.78rem; font-weight:600; }
+.hhead { display:flex; align-items:center; gap:12px; padding:10px 16px; background:var(--head); color:var(--head-ink); font-size:.78rem; font-weight:600; }
 .hhead .hh-main { flex:1; min-width:0; } .hhead .hh-mark { width:30px; text-align:center; overflow:visible; white-space:nowrap; } .hhead .hh-btn { width:44px; text-align:center; }
 @media (max-width:520px) { .hhead { gap:8px; padding:10px 12px; } }
 .hist-body { padding-top:0; }
-.hist-body .filters { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; padding:1rem 1rem 0; align-items:end; }
+.hist-body .filters { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; padding:12px 16px; align-items:end; background:var(--head); }
+.hist-body .filters > label { color:var(--head-ink); font-weight:600; }
 .hist-body .hhead { margin-top:-.0rem; }
 .rbar { background:var(--head); border-bottom:0; padding:10px 12px; }
 .toolbar { grid-template-columns:repeat(3,minmax(0,1fr)); }
-.toolbar button { background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.35); color:#fff; }
-.toolbar button:hover:not(:disabled) { background:rgba(255,255,255,.32); border-color:rgba(255,255,255,.5); }
-.toolbar .ico { color:#fff; }
-.mv.b { background:var(--cocoa); border-color:var(--cocoa); color:#fff; } .mv.b .g { color:#fff; }
+.toolbar button { background:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.75); color:var(--head-ink); }
+.toolbar button:hover:not(:disabled) { background:rgba(255,255,255,.7); border-color:#fff; }
+.toolbar .ico { color:var(--head-ink); }
+.mv.b { background:#8A6A52; border-color:#8A6A52; color:#fff; } .mv.b .g { color:#fff; }
+
+/* ==== Revisi: samakan dengan gambar referensi — bubble pembungkus, tombol cokelat 3D, kepala bubble, replay ==== */
+:root {
+  --btn1:#76503A; --btn2:#634330; --btn-line:#5B3D2A;
+  --tan1:#C7A185; --tan2:#B58E70; --tan-line:#AD8668;
+  --head:#A0785C; --head2:#946D50; --head-ink:#fff;
+  --bubble1:#FAF2E9; --bubble2:#F7ECE2;
+  --sq-light:#FBEDE3; --sq-dark:#C5A388;
+}
+body { background:#FAF3EC; }
+
+/* Bubble yang menghubungkan semuanya */
+.bubble { background:linear-gradient(180deg,var(--bubble1),var(--bubble2)); border:1px solid rgba(169,130,97,.16); border-radius:30px; padding:14px;
+  box-shadow:0 12px 34px rgba(94,63,43,.10), inset 0 1px 0 rgba(255,255,255,.8); }
+.bubble.stack { gap:14px; }
+.bubble > .sec { margin-top:0; }
+.bubble > .sec + .sec { margin-top:1.25rem; }
+.bubble > #secSetup { margin-top:0; }
+.bubble .title-row { padding:0 6px; margin-bottom:.75rem; }
+.bubble .title-row h2 { font-size:17px; }
+.bubble .panel { background:#FCF7F2; border:0; border-radius:24px; box-shadow:0 4px 16px rgba(94,63,43,.08); }
+.bubble .wave { color:#BE9674; }
+.bubble .wave .w1 path { fill-opacity:.28; } .bubble .wave .w2 path { fill-opacity:.18; } .bubble .wave .w3 path { stroke-opacity:.6; }
+body.playing .bubble { background:none; border:0; box-shadow:none; padding:0; border-radius:0; }
+
+/* Kartu Play (beranda) */
+body:not(.playing) #secSetup.playcard { padding:16px 14px 14px; border-radius:26px; background:linear-gradient(180deg,#FBF3ED 0%,#EBD9CB 100%);
+  border:1px solid rgba(169,130,97,.16); box-shadow:0 6px 20px rgba(94,63,43,.08), inset 0 1px 0 rgba(255,255,255,.8); }
+#secSetup.playcard > .wave-clip { border-radius:26px; }
+body.playing #secSetup.playcard > .wave-clip { display:none; }
+body:not(.playing) #setupBody > .card { background:none; border:0; box-shadow:none; padding:0; gap:12px; }
+#setupBody > .card > .wave-clip { display:none; }
+
+/* Kartu kepala halaman detail/replay */
+.bubble > .card.wavy { background:linear-gradient(180deg,#FBF3ED,#EAD7C8); border:1px solid rgba(169,130,97,.16); border-radius:26px; padding:16px 14px 14px;
+  box-shadow:0 6px 20px rgba(94,63,43,.08), inset 0 1px 0 rgba(255,255,255,.8); }
+h1.ttl { display:flex; align-items:center; gap:12px; font-size:17px; font-weight:700; letter-spacing:0; padding:0 6px; }
+h1.ttl .ico { width:24px; height:24px; color:var(--caramel); }
+
+/* Versus (dua pemain) sebagai bubble transparan di dalam kartu */
+.bubble .versus-row { background:rgba(255,253,250,.55); border:1px solid rgba(255,255,255,.75); border-radius:24px; padding:14px;
+  box-shadow:0 2px 12px rgba(94,63,43,.06); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); gap:8px; }
+.bubble .versus-row .row { flex-direction:row; text-align:left; align-items:center; gap:10px; }
+.bubble .versus-row .row > div { width:auto; min-width:0; }
+.bubble .versus-row .avatar { width:52px; height:52px; border:2px solid #fff; box-shadow:0 2px 8px rgba(94,63,43,.18); }
+.bubble .versus-row strong { font-size:13px; font-weight:700; }
+.bubble .versus-row .muted { font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bubble .vs { width:38px; height:38px; background:#FBF3EC; border:0; box-shadow:0 2px 8px rgba(94,63,43,.12); color:var(--cocoa); font-weight:700; }
+
+/* Tombol cokelat 3D: Home, Buat pertandingan, Terima */
+.bubble button.big:not(.ghost), .bubble a.button:not(.ghost):not(.replay) {
+  background:linear-gradient(180deg,var(--btn1),var(--btn2)); border:1px solid var(--btn-line); color:#fff; border-radius:16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 4px 12px rgba(94,63,43,.26); }
+.bubble button.big:not(.ghost):hover:not(:disabled), .bubble a.button:not(.ghost):not(.replay):hover {
+  background:linear-gradient(180deg,#80583F,#6B4934); border-color:var(--btn-line); }
+.bubble .actions2 .button, .bubble .actions2 button { min-height:44px; font-size:13px; border-radius:16px; }
+.bubble button.ghost:not(.colorbtn) { background:linear-gradient(180deg,#FFFCF9,#F8EDE3); border:1px solid #EBDCCF; color:var(--cocoa); border-radius:18px;
+  box-shadow:0 3px 10px rgba(94,63,43,.07); }
+.bubble button.ghost:not(.colorbtn):hover:not(:disabled) { background:#fff; border-color:var(--caramel); }
+.bubble .actions2 button.ghost { border-color:rgba(255,255,255,.9); }
+
+/* Pilihan warna */
+.bubble .colorbtn { background:rgba(255,252,249,.85); border:2px solid transparent; border-radius:18px; min-height:84px; box-shadow:0 2px 10px rgba(94,63,43,.07); }
+.bubble .colorbtn:not([aria-checked=true]):hover:not(:disabled) { background:#fff; border-color:rgba(169,130,97,.35); }
+.bubble .colorbtn[aria-checked=true], .bubble .colorbtn[aria-checked=true]:hover:not(:disabled) { background:#FFFCF9; border-color:#8B6347; box-shadow:0 0 0 3px rgba(139,99,71,.12); }
+.bubble .colorbtn small { color:var(--cocoa); font-size:12px; }
+
+/* Tombol replay (riwayat) */
+.button.replay, .button.replay:hover { background:linear-gradient(180deg,#6A4731,#573927); border:1px solid #4E3322; border-radius:14px; width:50px; min-height:42px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 3px 8px rgba(78,51,34,.28); }
+.button.replay:hover:not(:disabled) { background:linear-gradient(180deg,#76503A,#634330); }
+.button.replay .ico { width:20px; height:20px; }
+.mark { width:36px; height:32px; border-radius:12px; }
+
+/* 3 tombol kontrol replay: <  play  > */
+.rbar { background:none; border:0; padding:0; }
+.toolbar { grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; }
+.toolbar button { min-height:48px; border-radius:18px; background:linear-gradient(180deg,var(--tan1),var(--tan2)); border:1px solid var(--tan-line); color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 4px 10px rgba(133,87,60,.22); }
+.toolbar button:hover:not(:disabled) { background:linear-gradient(180deg,#CDA98D,#BB9476); border-color:var(--tan-line); }
+.toolbar .ico { color:#fff; width:22px; height:22px; }
+
+/* Papan + daftar langkah */
+.board { border-color:#85573C; border-radius:20px; }
+.replay-wrap { gap:14px; }
+.replay-wrap .panel { background:none; border:0; box-shadow:none; border-radius:18px; }
+.mlist { max-height:272px; }
+.mrow { height:54px; min-height:54px; padding:0 12px; border-radius:16px; background:rgba(255,252,249,.78); }
+.mrow:nth-child(even) { background:transparent; }
+.mnum { color:var(--cocoa); }
+.mv { height:36px; border-radius:12px; font-size:13px; }
+.mv.w { background:#FFFDFB; border:1px solid #EBDCCF; color:var(--cocoa); }
+.mv.b { background:linear-gradient(180deg,#704C34,#5F3F2B); border-color:#5F3F2B; color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 2px 6px rgba(78,51,34,.25); }
+.mv.b .g { color:#fff; }
+
+/* Kepala bubble: Versus & History */
+.cmp thead th { background:var(--head); color:#fff; }
+.cmp thead th.num { color:#fff; }
+.cmp tbody tr { background:#FCF7F2; } .cmp tbody tr:nth-child(even) { background:#F8EEE4; }
+.cmp .best { background:#F0DECF; }
+.hist-body { padding:0; gap:0; }
+.hist-body .filters { background:var(--head2); padding:16px 16px 12px; gap:12px; }      /* cokelat sampai mentok ke atas bubble */
+.hist-body .filters > label { color:rgba(255,255,255,.92); font-weight:600; font-size:12px; }
+.hist-body .filters select { background:#FFFCF9; border:1px solid rgba(255,255,255,.6); border-radius:16px; color:var(--cocoa); }
+.hhead { background:var(--head2); color:#fff; border-top:1px solid rgba(255,255,255,.18); }
+.hlist { border:0; }
+.hrow { background:#FCF7F2; } .hrow:nth-child(even) { background:#F7ECE1; }
+.hist-body > .row.between { padding:14px 16px; }
+@media (max-width:520px) { .bubble { padding:12px; border-radius:28px; } .bubble .versus-row .avatar { width:46px; height:46px; } }
 </style>
 </head>
 <body>
@@ -487,6 +598,7 @@ const ICONS = {
   home: '<path d="M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6"/>',
   swap: '<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
   back: '<path d="M19 12H5M11 5l-7 7 7 7"/>',
+  shuffle: '<path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/>',
 };
 const WAVE_SVG = '<svg class="wave" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true"><g class="w1"><path d="M0 36 Q150 -4 300 36 T600 36 T900 36 T1200 36 V120 H0Z" fill="currentColor"/></g><g class="w2"><path d="M0 44 Q150 6 300 44 T600 44 T900 44 T1200 44 V120 H0Z" fill="currentColor"/></g><g class="w3"><path d="M0 34 Q150 -6 300 34 T600 34 T900 34 T1200 34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></g></svg>';
 const waveHtml = () => `<div class="wave-clip" aria-hidden="true">${WAVE_SVG}</div>`;
@@ -778,7 +890,7 @@ function paintSetup() {
           <div class="colorseg" role="radiogroup" aria-label="Pilih warna">${[['w', 'Putih', 'Putih (jalan dulu)'], ['random', 'Acak', 'Acak'], ['b', 'Hitam', 'Hitam']].map(([v, l, t]) =>
             `<button type="button" class="ghost colorbtn" role="radio" data-color="${v}" aria-checked="false" aria-label="${t}"><span class="knight k-${v}" aria-hidden="true">♞&#xFE0E;</span><small>${l}</small></button>`).join('')}</div>
           <input type="hidden" id="color" value="w"></div>
-        <button id="create" class="big">${icon('swords')} Buat pertandingan</button></div>`;
+        <button id="create" class="big">${icon('shuffle')} Buat pertandingan</button></div>`;
       const setColor = v => { $('#color').value = v; box.querySelectorAll('.colorbtn').forEach(b => b.setAttribute('aria-checked', String(b.dataset.color === v))); };
       box.querySelectorAll('.colorbtn').forEach(b => { b.onclick = () => setColor(b.dataset.color); });
       setColor(chosen || 'w');
@@ -898,13 +1010,13 @@ const pages = {
       rpc('list_games', { p_filter: historyQuery.filter, p_sort: historyQuery.sort, p_page: historyQuery.page })]);
     data.catch(() => {});
     return () => {
-      view.innerHTML = `
-        <section class="sec" id="secSetup"><div class="title-row"><h2>${icon('crown')}Play</h2>
+      view.innerHTML = `<div class="bubble">
+        <section class="sec playcard wavy" id="secSetup">${waveHtml()}<div class="title-row"><h2>${icon('crown')}Play</h2>
           <button type="button" class="link" id="quickStart" title="Buat pertandingan dengan warna acak">Quick Start →</button></div><div id="setupBody"></div></section>
         <section class="sec" id="secH2H"><div class="title-row"><h2>${icon('bars')}Versus</h2>
           <button type="button" class="link" id="h2hMore"></button></div><div id="h2hBody" class="panel"></div></section>
         <section class="sec" id="secHistory"><div class="title-row"><h2>${icon('clock')}History</h2>
-          <button type="button" class="link" id="historyMore" hidden></button></div><div id="historyBody" class="panel"></div></section>`;
+          <button type="button" class="link" id="historyMore" hidden></button></div><div id="historyBody" class="panel"></div></section></div>`;
       paintSetup();
       const anchor = $('#historyBody');
       data.then(([stats, hist]) => {
@@ -940,15 +1052,15 @@ const pages = {
         const cells = frames.map((f, i) => [f, i]).filter(([f]) => f.turn && f.turn.id === t.id);
         return cells.length ? `<div class="mrow"><span class="mnum">${t.turn_number}</span><div class="mchips">${cells.map(([f, i]) => chip(f, i)).join('')}</div></div>` : '';
       }).join('');
-      view.innerHTML = `<div class="stack">
-        <div class="card stack wavy">${waveHtml()}<h1 style="margin:0">${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</h1>
+      view.innerHTML = `<div class="bubble stack">
+        <div class="card stack wavy">${waveHtml()}<h1 class="ttl" style="margin:0">${icon('crown')}<span>${g.status === 'waiting' || g.status === 'active' ? 'Sedang berlangsung' : result(g)}</span></h1>
           <div class="versus-row">${who(pair[0][0], pair[0][1])}<div class="vs" aria-hidden="true">VS</div>${who(pair[1][0], pair[1][1])}</div>
           <div class="actions2"><button id="rematch" class="ghost" title="Main lagi dengan warna tertukar" ${live ? 'disabled' : ''}>${icon('swap')}<span>Rematch</span></button>
             <a class="button" href="#home">${icon('home')}<span>Home</span></a></div></div>
         <div class="replay-wrap"><div id="rboard"></div>
-          <div class="panel"><div class="rbar"><div class="toolbar" role="group" aria-label="Kontrol replay">
+          <div class="rbar"><div class="toolbar" role="group" aria-label="Kontrol replay">
             ${[['back', 'Sebelumnya', 'prev'], ['toggle', 'Play', 'play'], ['fwd', 'Berikutnya', 'next']].map(btn).join('')}</div></div>
-            <div class="mlist" id="mlist">${rowsHtml || '<div class="center">Belum ada langkah.</div>'}</div></div></div></div>`;
+          <div class="panel"><div class="mlist" id="mlist">${rowsHtml || '<div class="center">Belum ada langkah.</div>'}</div></div></div></div>`;
       $('#rematch').onclick = () => run(async () => {
         await rpc('create_match', { p_color: g.player_white === boot.me ? 'b' : 'w', p_rematch_of: g.id });
         location.hash = 'home';
